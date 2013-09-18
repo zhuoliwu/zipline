@@ -40,7 +40,7 @@ choose_treasury = functools.partial(choose_treasury, lambda *args: '10year',
                                     compound=False)
 
 
-def sharpe_ratio(algorithm_volatility, algorithm_return, treasury_return):
+def sharpe_ratio(algorithm_volatility, annualized_return, treasury_return):
     """
     http://en.wikipedia.org/wiki/Sharpe_ratio
 
@@ -55,8 +55,8 @@ def sharpe_ratio(algorithm_volatility, algorithm_return, treasury_return):
     if zp_math.tolerant_equals(algorithm_volatility, 0):
         return np.nan
 
-    return ((
-        np.mean(algorithm_return - treasury_return) * 252
+    return (
+        (annualized_return - treasury_return)
         # The square of the annualization factor is in the volatility,
         # because the volatility is also annualized,
         # i.e. the sqrt(annual factor) is in the volatility's numerator.
@@ -65,7 +65,7 @@ def sharpe_ratio(algorithm_volatility, algorithm_return, treasury_return):
         # The square of the sqrt of the annual factor, i.e. the annual factor
         # itself, is needed in the numerator to factor out the division by
         # its square root.
-        / algorithm_volatility))
+        / algorithm_volatility)
 
 
 class RiskMetricsCumulative(object):
@@ -106,6 +106,8 @@ class RiskMetricsCumulative(object):
         self.algorithm_returns = None
         self.benchmark_returns = None
 
+        self.annualized_mean_returns = None
+
         self.compounded_log_returns = []
         self.moving_avg = []
 
@@ -136,10 +138,15 @@ class RiskMetricsCumulative(object):
         self.benchmark_returns_cont = pd.Series(index=pd.date_range(
             sim_params.first_open, sim_params.last_close,
             freq="Min"))
+        self.annualized_mean_returns_cont = pd.Series(index=pd.date_range(
+            sim_params.first_open, sim_params.last_close,
+            freq="Min"))
 
     def initialize_daily_indices(self):
         self.algorithm_returns_cont = pd.Series(index=self.trading_days)
         self.benchmark_returns_cont = pd.Series(index=self.trading_days)
+        self.annualized_mean_returns_cont = pd.Series(
+            index=self.trading_days)
 
     @property
     def last_return_date(self):
@@ -148,6 +155,14 @@ class RiskMetricsCumulative(object):
     def update(self, dt, algorithm_returns, benchmark_returns):
         self.algorithm_returns_cont[dt] = algorithm_returns
         self.algorithm_returns = self.algorithm_returns_cont.valid()
+
+        mean_return = (np.sum(self.algorithm_returns)
+                       /
+                       np.size(self.algorithm_returns))
+
+        self.annualized_mean_returns_cont[dt] = mean_return * 252
+        self.annualized_mean_returns = \
+            self.annualized_mean_returns_cont.valid()
 
         self.benchmark_returns_cont[dt] = benchmark_returns
         self.benchmark_returns = self.benchmark_returns_cont.valid()
@@ -315,8 +330,8 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
         http://en.wikipedia.org/wiki/Sharpe_ratio
         """
         return sharpe_ratio(self.algorithm_volatility[-1],
-                            self.algorithm_returns,
-                            self.daily_treasury)
+                            self.annualized_mean_returns[-1],
+                            self.daily_treasury.valid()[-1])
 
     def calculate_sortino(self, mar=None):
         """

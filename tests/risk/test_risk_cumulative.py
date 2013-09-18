@@ -66,4 +66,5 @@ class TestRisk(unittest.TestCase):
     def test_sharpe_06(self):
         np.testing.assert_almost_equal(
             ANSWER_KEY.ALGORITHM_CUMULATIVE_SHARPE,
-            self.cumulative_metrics_06.sharpe)
+            self.cumulative_metrics_06.sharpe,
+            decimal=2)
