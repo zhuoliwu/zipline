@@ -96,7 +96,11 @@ class AlgorithmSimulator(object):
         """
         Main generator work loop.
         """
+        # Market open and market close values are only used
+        # with 'minute' data_frequency algorithms.
+        data_frequency = self.algo.data_frequency
         # Initialize the mkt_close
+        mkt_open = self.algo.perf_tracker.market_open
         mkt_close = self.algo.perf_tracker.market_close
 
         # inject the current algo
@@ -105,6 +109,14 @@ class AlgorithmSimulator(object):
             updated = False
             bm_updated = False
             for date, snapshot in stream_in:
+                if data_frequency == 'minute':
+                    # Every time the date goes over the market close
+                    # advance the market and open close values
+                    if date > mkt_close:
+                        mkt_open, mkt_close = \
+                            trading.environment.next_open_and_close(
+                                mkt_close
+                            )
                 self.algo.set_datetime(date)
                 self.simulation_dt = date
                 self.algo.perf_tracker.set_date(date)
@@ -152,7 +164,11 @@ class AlgorithmSimulator(object):
                     # Send the current state of the universe
                     # to the user's algo.
                     if updated:
-                        self.algo.handle_data(self.current_data)
+                        if data_frequency == 'minute':
+                            if date >= mkt_open:
+                                self.algo.handle_data(self.current_data)
+                        else:
+                            self.algo.handle_data(self.current_data)
                         updated = False
 
                     # run orders placed in the algorithm call
@@ -189,7 +205,7 @@ class AlgorithmSimulator(object):
                             tp = self.algo.perf_tracker.todays_performance
                             tp.rollover()
                             if mkt_close <= self.algo.perf_tracker.last_close:
-                                _, mkt_close = \
+                                mkt_open, mkt_close = \
                                     trading.environment.next_open_and_close(
                                         mkt_close
                                     )
