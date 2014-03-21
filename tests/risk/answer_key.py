@@ -163,17 +163,17 @@ class AnswerKey(object):
 
         # Below matches the inconsistent capitalization in spreadsheet
         'BENCHMARK_PERIOD_RETURNS': {
-            'Monthly': DataIndex('s_p', 'P', 8, 19),
-            '3-Month': DataIndex('s_p', 'Q', 10, 19),
-            '6-month': DataIndex('s_p', 'R', 13, 19),
-            'year': DataIndex('s_p', 'S', 19, 19),
+            'Monthly': DataIndex('s_p', 'R', 8, 19),
+            '3-Month': DataIndex('s_p', 'S', 10, 19),
+            '6-month': DataIndex('s_p', 'T', 13, 19),
+            'year': DataIndex('s_p', 'U', 19, 19),
         },
 
         'BENCHMARK_PERIOD_VOLATILITY': {
-            'Monthly': DataIndex('s_p', 'T', 8, 19),
-            '3-Month': DataIndex('s_p', 'U', 10, 19),
-            '6-month': DataIndex('s_p', 'V', 13, 19),
-            'year': DataIndex('s_p', 'W', 19, 19),
+            'Monthly': DataIndex('s_p', 'V', 8, 19),
+            '3-Month': DataIndex('s_p', 'W', 10, 19),
+            '6-month': DataIndex('s_p', 'X', 13, 19),
+            'year': DataIndex('s_p', 'Y', 19, 19),
         },
 
         'ALGORITHM_PERIOD_RETURNS': {
