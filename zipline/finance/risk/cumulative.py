@@ -261,13 +261,14 @@ class RiskMetricsCumulative(object):
         self.annualized_mean_returns_cont[dt] = \
             self.mean_returns_cont[dt] * 252
 
-        if self.create_first_day_stats:
-            self.mean_returns = pd.Series(
-                {'null return': 0.0}).append(self.mean_returns)
-            self.annualized_mean_returns = pd.Series(
-                {'null return': 0.0}).append(self.annualized_mean_returns)
-
         self.annualized_mean_returns = self.annualized_mean_returns_cont[:dt]
+
+        if self.create_first_day_stats:
+            if len(self.mean_returns) == 1:
+                self.mean_returns = pd.Series(
+                    {'null return': 0.0}).append(self.mean_returns)
+                self.annualized_mean_returns = pd.Series(
+                    {'null return': 0.0}).append(self.annualized_mean_returns)
 
         self.benchmark_returns_cont[dt] = benchmark_returns
         self.benchmark_returns = self.benchmark_returns_cont[:dt]
@@ -352,6 +353,16 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
                     'null return')
                 self.benchmark_returns.index = pd.to_datetime(
                     self.benchmark_returns.index)
+            if 'null return' in self.mean_returns:
+                self.mean_returns = self.mean_returns.drop(
+                    'null return')
+                self.mean_returns.index = pd.to_datetime(
+                    self.mean_returns.index)
+            if 'null return' in self.annualized_mean_returns:
+                self.annualized_mean_returns = \
+                    self.annualized_mean_returns.drop('null return')
+                self.annualized_mean_returns.index = pd.to_datetime(
+                    self.mean_returns.index)
 
     def to_dict(self):
         """
