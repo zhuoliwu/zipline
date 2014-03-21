@@ -261,6 +261,12 @@ class RiskMetricsCumulative(object):
         self.annualized_mean_returns_cont[dt] = \
             self.mean_returns_cont[dt] * 252
 
+        if self.create_first_day_stats:
+            self.mean_returns = pd.Series(
+                {'null return': 0.0}).append(self.mean_returns)
+            self.annualized_mean_returns = pd.Series(
+                {'null return': 0.0}).append(self.annualized_mean_returns)
+
         self.annualized_mean_returns = self.annualized_mean_returns_cont[:dt]
 
         self.benchmark_returns_cont[dt] = benchmark_returns
