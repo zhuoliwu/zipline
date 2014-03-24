@@ -81,7 +81,7 @@ class TradingEnvironment(object):
         bm_symbol='^GSPC',
         exchange_tz="US/Eastern",
         max_date=None,
-        extra_dates=None
+        trading_calendar_cls=trading_calendar_cls,
     ):
         self.prev_environment = self
         self.bm_symbol = bm_symbol
@@ -97,19 +97,16 @@ class TradingEnvironment(object):
 
         self.exchange_tz = exchange_tz
 
-        bi = self.benchmark_returns.index
-        if max_date:
-            self.trading_days = bi[bi <= max_date].copy()
-        else:
-            self.trading_days = bi.copy()
+        start = None
+        end = None
+        self.trading_calendar = trading_calendar_cls(start=start, end=end)
 
-        if len(self.benchmark_returns) and extra_dates:
-            for extra_date in extra_dates:
-                extra_date = extra_date.replace(hour=0, minute=0, second=0,
-                                                microsecond=0)
-                if extra_date not in self.trading_days:
-                    self.trading_days = self.trading_days + \
-                        pd.DatetimeIndex([extra_date])
+        bi = self.benchmark_returns.index
+
+        if max_date:
+            self.trading_days = self.trading_calender.trading_days
+        else:
+            max_date = bi.index[-1]
 
         self.first_trading_day = self.trading_days[0]
         self.last_trading_day = self.trading_days[-1]
