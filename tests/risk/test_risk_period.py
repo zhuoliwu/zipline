@@ -624,57 +624,6 @@ class TestRisk_08(unittest.TestCase):
                               for x in metrics.year_periods],
                              [0.411])
 
-    def test_treasury_returns_06(self):
-        with self.sim_params.environment:
-            returns = factory.create_returns_from_range(self.sim_params)
-            metrics = risk.RiskReport(returns, self.sim_params)
-            self.assertEqual([round(x.treasury_period_return, 4)
-                              for x in metrics.month_periods],
-                             [0.0037,
-                              0.0034,
-                              0.0039,
-                              0.0038,
-                              0.0040,
-                              0.0037,
-                              0.0043,
-                              0.0043,
-                              0.0038,
-                              0.0044,
-                              0.0043,
-                              0.004])
-
-            self.assertEqual([round(x.treasury_period_return, 4)
-                              for x in metrics.three_month_periods],
-                             [0.0114,
-                              0.0116,
-                              0.0122,
-                              0.0125,
-                              0.0129,
-                              0.0127,
-                              0.0123,
-                              0.0128,
-                              0.0125,
-                              0.0127])
-            self.assertEqual([round(x.treasury_period_return, 4)
-                              for x in metrics.six_month_periods],
-                             [0.0260,
-                              0.0257,
-                              0.0258,
-                              0.0252,
-                              0.0259,
-                              0.0256,
-                              0.0257])
-
-            self.assertEqual([round(x.treasury_period_return, 4)
-                              for x in metrics.year_periods],
-                             [0.0500])
-
-        def test_benchmarkrange(self):
-            self.check_year_range(
-                datetime.datetime(
-                    year=2008, month=1, day=1, tzinfo=pytz.utc),
-                2)
-
     def test_partial_month(self):
 
         start = datetime.datetime(
