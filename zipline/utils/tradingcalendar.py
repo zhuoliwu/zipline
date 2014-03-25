@@ -84,12 +84,12 @@ class TradingCalendar(with_metaclass(abc.ABCMeta)):
         self.close_time = (16, 0)
         self.early_close_time = (13, 0)
 
-    @abc.abstractstaticmethod
-    def get_non_trading_days(start, end):
+    @abc.abstractmethod
+    def get_non_trading_days(self, start, end):
         pass
 
-    @abc.abstractstaticmethod
-    def get_early_closes(start, end):
+    @abc.abstractmethod
+    def get_early_closes(self, start, end):
         pass
 
     @property
@@ -128,7 +128,7 @@ class TradingCalendar(with_metaclass(abc.ABCMeta)):
 
 class USEquitiesTradingCalendar(object):
 
-    def get_non_trading_days(start, end):
+    def get_non_trading_days(self, start, end):
         non_trading_rules = []
 
         weekends = rrule.rrule(
@@ -341,7 +341,7 @@ class USEquitiesTradingCalendar(object):
         non_trading_days.sort()
         return pd.DatetimeIndex(non_trading_days)
 
-    def get_early_closes(start, end):
+    def get_early_closes(self, start, end):
         # 1:00 PM close rules based on
         # http://quant.stackexchange.com/questions/4083/nyse-early-close-rules-july-4th-and-dec-25th # noqa
         # and verified against http://www.nyse.com/pdfs/closings.pdf
