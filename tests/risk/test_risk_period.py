@@ -30,7 +30,7 @@ ANSWER_KEY = AnswerKey()
 RETURNS = ANSWER_KEY.RETURNS
 
 
-class TestRisk(unittest.TestCase):
+class TestRisk_06(unittest.TestCase):
 
     def setUp(self):
 
@@ -54,29 +54,11 @@ class TestRisk(unittest.TestCase):
             self.sim_params
         )
 
-        self.metrics_06 = risk.RiskReport(
-            self.algo_returns_06,
-            self.sim_params
-        )
-
-        start_08 = datetime.datetime(
-            year=2008,
-            month=1,
-            day=1,
-            hour=0,
-            minute=0,
-            tzinfo=pytz.utc)
-
-        end_08 = datetime.datetime(
-            year=2008,
-            month=12,
-            day=31,
-            tzinfo=pytz.utc
-        )
-        self.sim_params08 = SimulationParameters(
-            period_start=start_08,
-            period_end=end_08
-        )
+        with self.sim_params.environment:
+            self.metrics_06 = risk.RiskReport(
+                self.algo_returns_06,
+                self.sim_params
+            )
 
     def tearDown(self):
         return
@@ -123,9 +105,11 @@ class TestRisk(unittest.TestCase):
         with self.sim_params.environment:
             returns = factory.create_returns_from_range(self.sim_params)
             metrics = risk.RiskReport(returns, self.sim_params)
-            self.assertEqual([x.num_trading_days for x in metrics.year_periods],
+            self.assertEqual([x.num_trading_days for x in
+                              metrics.year_periods],
                              [251])
-            self.assertEqual([x.num_trading_days for x in metrics.month_periods],
+            self.assertEqual([x.num_trading_days for x in
+                              metrics.month_periods],
                              [20, 19, 23, 19, 22, 22, 20, 23, 20, 22, 21, 20])
 
     def test_benchmark_volatility_06(self):
@@ -285,76 +269,254 @@ class TestRisk(unittest.TestCase):
                              [-0.001])
 
     def test_algorithm_beta_06(self):
-        with self.sim_params.environment:
-            np.testing.assert_almost_equal(
-                [x.beta for x in self.metrics_06.month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_BETA['Monthly'])
-            np.testing.assert_almost_equal(
-                [x.beta for x in self.metrics_06.three_month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_BETA['3-Month'])
-            np.testing.assert_almost_equal(
-                [x.beta for x in self.metrics_06.six_month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_BETA['6-month'])
-            np.testing.assert_almost_equal(
-                [x.beta for x in self.metrics_06.year_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_BETA['year'])
+        np.testing.assert_almost_equal(
+            [x.beta for x in self.metrics_06.month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_BETA['Monthly'])
+        np.testing.assert_almost_equal(
+            [x.beta for x in self.metrics_06.three_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_BETA['3-Month'])
+        np.testing.assert_almost_equal(
+            [x.beta for x in self.metrics_06.six_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_BETA['6-month'])
+        np.testing.assert_almost_equal(
+            [x.beta for x in self.metrics_06.year_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_BETA['year'])
 
     def test_algorithm_alpha_06(self):
-        with self.sim_params.environment:
-            np.testing.assert_almost_equal(
-                [x.alpha for x in self.metrics_06.month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_ALPHA['Monthly'])
-            np.testing.assert_almost_equal(
-                [x.alpha for x in self.metrics_06.three_month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_ALPHA['3-Month'])
-            np.testing.assert_almost_equal(
-                [x.alpha for x in self.metrics_06.six_month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_ALPHA['6-month'])
-            np.testing.assert_almost_equal(
-                [x.alpha for x in self.metrics_06.year_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_ALPHA['year'])
+        np.testing.assert_almost_equal(
+            [x.alpha for x in self.metrics_06.month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_ALPHA['Monthly'])
+        np.testing.assert_almost_equal(
+            [x.alpha for x in self.metrics_06.three_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_ALPHA['3-Month'])
+        np.testing.assert_almost_equal(
+            [x.alpha for x in self.metrics_06.six_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_ALPHA['6-month'])
+        np.testing.assert_almost_equal(
+            [x.alpha for x in self.metrics_06.year_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_ALPHA['year'])
 
-    # FIXME: Covariance is not matching excel precisely enough to run the test.
-    # Month 4 seems to be the problem. Variance is disabled
-    # just to avoid distraction - it is much closer than covariance
-    # and can probably pass with 6 significant digits instead of 7.
-    # re-enable variance, alpha, and beta tests once this is resolved
     def test_algorithm_covariance_06(self):
-        with self.sim_params.environment:
-            np.testing.assert_almost_equal(
-                [x.algorithm_covariance for x in self.metrics_06.month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_COVARIANCE['Monthly'])
-            np.testing.assert_almost_equal(
-                [x.algorithm_covariance
-                 for x in self.metrics_06.three_month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_COVARIANCE['3-Month'])
-            np.testing.assert_almost_equal(
-                [x.algorithm_covariance
-                 for x in self.metrics_06.six_month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_COVARIANCE['6-month'])
-            np.testing.assert_almost_equal(
-                [x.algorithm_covariance
-                 for x in self.metrics_06.year_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_COVARIANCE['year'])
+        np.testing.assert_almost_equal(
+            [x.algorithm_covariance for x
+             in self.metrics_06.month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_COVARIANCE['Monthly'])
+        np.testing.assert_almost_equal(
+            [x.algorithm_covariance
+             for x in self.metrics_06.three_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_COVARIANCE['3-Month'])
+        np.testing.assert_almost_equal(
+            [x.algorithm_covariance
+             for x in self.metrics_06.six_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_COVARIANCE['6-month'])
+        np.testing.assert_almost_equal(
+            [x.algorithm_covariance
+             for x in self.metrics_06.year_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_COVARIANCE['year'])
 
     def test_benchmark_variance_06(self):
+        np.testing.assert_almost_equal(
+            [x.benchmark_variance
+             for x in self.metrics_06.month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['Monthly'])
+        np.testing.assert_almost_equal(
+            [x.benchmark_variance
+             for x in self.metrics_06.three_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['3-Month'])
+        np.testing.assert_almost_equal(
+            [x.benchmark_variance
+             for x in self.metrics_06.six_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['6-month'])
+        np.testing.assert_almost_equa(
+            [x.benchmark_variance
+             for x in self.metrics_06.year_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['year'])
+
+    def test_treasury_returns_06(self):
         with self.sim_params.environment:
-            np.testing.assert_almost_equal(
-                [x.benchmark_variance
-                 for x in self.metrics_06.month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['Monthly'])
-            np.testing.assert_almost_equal(
-                [x.benchmark_variance
-                 for x in self.metrics_06.three_month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['3-Month'])
-            np.testing.assert_almost_equal(
-                [x.benchmark_variance
-                 for x in self.metrics_06.six_month_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['6-month'])
-            np.testing.assert_almost_equal(
-                [x.benchmark_variance
-                 for x in self.metrics_06.year_periods],
-                ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['year'])
+            returns = factory.create_returns_from_range(self.sim_params)
+            metrics = risk.RiskReport(returns, self.sim_params)
+            self.assertEqual([round(x.treasury_period_return, 4)
+                              for x in metrics.month_periods],
+                             [0.0037,
+                              0.0034,
+                              0.0039,
+                              0.0038,
+                              0.0040,
+                              0.0037,
+                              0.0043,
+                              0.0043,
+                              0.0038,
+                              0.0044,
+                              0.0043,
+                              0.004])
+
+            self.assertEqual([round(x.treasury_period_return, 4)
+                              for x in metrics.three_month_periods],
+                             [0.0114,
+                              0.0116,
+                              0.0122,
+                              0.0125,
+                              0.0129,
+                              0.0127,
+                              0.0123,
+                              0.0128,
+                              0.0125,
+                              0.0127])
+            self.assertEqual([round(x.treasury_period_return, 4)
+                              for x in metrics.six_month_periods],
+                             [0.0260,
+                              0.0257,
+                              0.0258,
+                              0.0252,
+                              0.0259,
+                              0.0256,
+                              0.0257])
+
+            self.assertEqual([round(x.treasury_period_return, 4)
+                              for x in metrics.year_periods],
+                             [0.0500])
+
+        def test_benchmarkrange(self):
+            self.check_year_range(
+                datetime.datetime(
+                    year=2008, month=1, day=1, tzinfo=pytz.utc),
+                2)
+
+    def test_partial_month(self):
+
+        start = datetime.datetime(
+            year=1991,
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            tzinfo=pytz.utc)
+
+        # 1992 and 1996 were leap years
+        total_days = 365 * 5 + 2
+        end = start + datetime.timedelta(days=total_days)
+        sim_params90s = SimulationParameters(
+            period_start=start,
+            period_end=end
+        )
+
+        returns = factory.create_returns_from_range(sim_params90s)
+        returns = returns[:-10]  # truncate the returns series to end mid-month
+        metrics = risk.RiskReport(returns, sim_params90s)
+        total_months = 60
+        self.check_metrics(metrics, total_months, start)
+
+    def check_year_range(self, start_date, years):
+        sim_params = SimulationParameters(
+            period_start=start_date,
+            period_end=start_date.replace(year=(start_date.year + years))
+        )
+        returns = factory.create_returns_from_range(sim_params)
+        metrics = risk.RiskReport(returns, self.sim_params)
+        total_months = years * 12
+        self.check_metrics(metrics, total_months, start_date)
+
+    def check_metrics(self, metrics, total_months, start_date):
+        """
+        confirm that the right number of riskmetrics were calculated for each
+        window length.
+        """
+        self.assert_range_length(
+            metrics.month_periods,
+            total_months,
+            1,
+            start_date
+        )
+
+        self.assert_range_length(
+            metrics.three_month_periods,
+            total_months,
+            3,
+            start_date
+        )
+
+        self.assert_range_length(
+            metrics.six_month_periods,
+            total_months,
+            6,
+            start_date
+        )
+
+        self.assert_range_length(
+            metrics.year_periods,
+            total_months,
+            12,
+            start_date
+        )
+
+    def assert_last_day(self, period_end):
+        # 30 days has september, april, june and november
+        if period_end.month in [9, 4, 6, 11]:
+            self.assertEqual(period_end.day, 30)
+        # all the rest have 31, except for february
+        elif(period_end.month != 2):
+            self.assertEqual(period_end.day, 31)
+        else:
+            if calendar.isleap(period_end.year):
+                self.assertEqual(period_end.day, 29)
+            else:
+                self.assertEqual(period_end.day, 28)
+
+    def assert_month(self, start_month, actual_end_month):
+        if start_month == 1:
+            expected_end_month = 12
+        else:
+            expected_end_month = start_month - 1
+
+        self.assertEqual(expected_end_month, actual_end_month)
+
+    def assert_range_length(self, col, total_months,
+                            period_length, start_date):
+        if(period_length > total_months):
+            self.assertEqual(len(col), 0)
+        else:
+            self.assertEqual(
+                len(col),
+                total_months - (period_length - 1),
+                "mismatch for total months - \
+                expected:{total_months}/actual:{actual}, \
+                period:{period_length}, start:{start_date}, \
+                calculated end:{end}".format(total_months=total_months,
+                                             period_length=period_length,
+                                             start_date=start_date,
+                                             end=col[-1].end_date,
+                                             actual=len(col))
+            )
+            self.assert_month(start_date.month, col[-1].end_date.month)
+            self.assert_last_day(col[-1].end_date)
+
+
+class TestRisk_08(unittest.TestCase):
+
+    def setUp(self):
+
+        start_08 = datetime.datetime(
+            year=2008,
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            tzinfo=pytz.utc)
+
+        end_08 = datetime.datetime(
+            year=2008,
+            month=12,
+            day=31,
+            tzinfo=pytz.utc
+        )
+        self.sim_params08 = SimulationParameters(
+            period_start=start_08,
+            period_end=end_08
+        )
+
+    def tearDown(self):
+        return
 
     def test_benchmark_returns_08(self):
         with self.sim_params08.environment:
