@@ -16,17 +16,11 @@ import abc
 import pandas as pd
 import pytz
 
-from datetime import datetime, timedelta
+from datetime import datetime, time
 from dateutil import rrule
 from functools import partial
 
 from six import with_metaclass
-
-start = pd.Timestamp('1990-01-01', tz='UTC')
-end_base = pd.Timestamp('today', tz='UTC')
-# Give an aggressive buffer for logic that needs to use the next trading
-# day or minute.
-end = end_base + timedelta(days=365)
 
 
 def canonicalize_datetime(dt):
@@ -60,12 +54,15 @@ def get_open_and_close(day, open_time, close_time, early_close_time,
     return market_open, market_close
 
 
-def get_open_and_closes(start, end, start_time, close_time,
+def get_open_and_closes(start, end, open_time, close_time,
                         early_close_time, early_close_dates, trading_days):
     open_and_closes = pd.DataFrame(index=trading_days,
                                    columns=('market_open', 'market_close'))
     get_o_and_c = partial(get_open_and_close,
-                          early_closes=early_close_dates)
+                          early_closes=early_close_dates,
+                          open_time=open_time,
+                          close_time=close_time,
+                          early_close_time=early_close_time)
 
     open_and_closes['market_open'], open_and_closes['market_close'] = \
         zip(*open_and_closes.index.map(get_o_and_c))
@@ -81,9 +78,11 @@ class TradingCalendar(with_metaclass(abc.ABCMeta)):
         self._non_trading_days = None
         self._trading_day = None
         self._trading_days = None
-        self.open_time = (9, 31)
-        self.close_time = (16, 0)
-        self.early_close_time = (13, 0)
+        self._early_closes = None
+        self._open_and_closes = None
+        self.open_time = time(9, 31)
+        self.close_time = time(16, 0)
+        self.early_close_time = time(13, 0)
 
     @abc.abstractmethod
     def get_non_trading_days(self, start, end):
@@ -111,22 +110,29 @@ class TradingCalendar(with_metaclass(abc.ABCMeta)):
     def trading_days(self):
         if self._trading_days is None:
             self._trading_days = pd.date_range(
-                start=start.date(),
-                end=end.date(),
+                start=self.start.date(),
+                end=self.end.date(),
                 freq=self.trading_day).tz_localize('UTC')
         return self._trading_days
 
     @property
     def open_and_closes(self):
         if self._open_and_closes is None:
-            self._open_and_closes = self.get_open_and_closes(
+            self._open_and_closes = get_open_and_closes(
                 self.start,
                 self.end,
                 self.open_time,
                 self.close_time,
                 self.early_close_time,
-                self.early_closes)
+                self.early_closes,
+                self.trading_days)
         return self._open_and_closes
+
+    @property
+    def early_closes(self):
+        if self._early_closes is None:
+            self._early_closes = self.get_early_closes(self.start, self.end)
+        return self._early_closes
 
 
 class USEquitiesTradingCalendar(TradingCalendar):

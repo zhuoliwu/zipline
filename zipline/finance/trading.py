@@ -105,9 +105,9 @@ class TradingEnvironment(object):
         self.first_trading_day = self.trading_days[0]
         self.last_trading_day = self.trading_days[-1]
 
-        self.early_closes = self.trading_environment.early_closes
+        self.early_closes = self.trading_calendar.early_closes
 
-        self.open_and_closes = self.trading_environment.open_and_closes
+        self.open_and_closes = self.trading_calendar.open_and_closes
 
     def __enter__(self, *args, **kwargs):
         global environment
@@ -212,10 +212,9 @@ class SimulationParameters(object):
                  emission_rate='daily',
                  data_frequency='daily'):
         global environment
-        if not environment:
-            # This is the global environment for trading simulation.
-            environment = TradingEnvironment(start_date=period_start,
-                                             end_date=period_end)
+        # This is the global environment for trading simulation.
+        environment = TradingEnvironment(start_date=period_start,
+                                         end_date=period_end)
 
         self.period_start = period_start
         self.period_end = period_end
