@@ -126,7 +126,7 @@ class TradingCalendar(with_metaclass(abc.ABCMeta)):
         return self._open_and_closes
 
 
-class USEquitiesTradingCalendar(object):
+class USEquitiesTradingCalendar(TradingCalendar):
 
     def get_non_trading_days(self, start, end):
         non_trading_rules = []
