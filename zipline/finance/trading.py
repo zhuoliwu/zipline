@@ -216,6 +216,8 @@ class SimulationParameters(object):
         environment = TradingEnvironment(start_date=period_start,
                                          end_date=period_end)
 
+        self.environment = environment
+
         self.period_start = period_start
         self.period_end = period_end
         self.capital_base = capital_base
