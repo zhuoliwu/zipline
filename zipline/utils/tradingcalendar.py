@@ -98,13 +98,14 @@ class TradingCalendar(with_metaclass(abc.ABCMeta)):
         if self._non_trading_days is None:
             self._non_trading_days = self.get_non_trading_days(
                 self.start, self.end)
+        return self._non_trading_days
 
     @property
     def trading_day(self):
         if self._trading_day is None:
             self._trading_day = \
                 pd.tseries.offsets.CDay(holidays=self.non_trading_days)
-        return self.trading_day
+        return self._trading_day
 
     @property
     def trading_days(self):
@@ -113,6 +114,7 @@ class TradingCalendar(with_metaclass(abc.ABCMeta)):
                 start=start.date(),
                 end=end.date(),
                 freq=self.trading_day).tz_localize('UTC')
+        return self._trading_days
 
     @property
     def open_and_closes(self):
