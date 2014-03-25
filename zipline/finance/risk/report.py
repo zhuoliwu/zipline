@@ -61,6 +61,8 @@ from dateutil.relativedelta import relativedelta
 
 from . period import RiskMetricsPeriod
 
+from zipline.finance import trading
+
 log = logbook.Logger('Risk Report')
 
 
@@ -120,16 +122,22 @@ class RiskReport(object):
         if len(self.algorithm_returns) == 0:
             return ends
 
+        td = trading.environment.trading_days
         # ensure that we have an end at the end of a calendar month, in case
         # the return series ends mid-month...
         the_end = end.replace(day=1) + relativedelta(months=1) - one_day
         while True:
             cur_end = cur_start + relativedelta(months=months_per) - one_day
+
             if(cur_end > the_end):
                 break
+
+            start_trading_day = td[td >= cur_start][0]
+            end_trading_day = td[td <= cur_end][-1]
+
             cur_period_metrics = RiskMetricsPeriod(
-                start_date=cur_start,
-                end_date=cur_end,
+                start_date=start_trading_day,
+                end_date=end_trading_day,
                 returns=self.algorithm_returns,
                 benchmark_returns=self.benchmark_returns
             )
