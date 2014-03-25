@@ -90,7 +90,7 @@ class TradingEnvironment(object):
 
         self.trading_calendar = trading_calendar_cls(start=start_date,
                                                      end=end_date)
-        self.trading_days = self.trading_calender.trading_days
+        self.trading_days = self.trading_calendar.trading_days
 
         self.benchmark_returns, treasury_curves_map = \
             load(self.trading_calendar.trading_day,
@@ -214,7 +214,8 @@ class SimulationParameters(object):
         global environment
         if not environment:
             # This is the global environment for trading simulation.
-            environment = TradingEnvironment(period_start, period_end)
+            environment = TradingEnvironment(start_date=period_start,
+                                             end_date=period_end)
 
         self.period_start = period_start
         self.period_end = period_end
