@@ -327,7 +327,7 @@ class TestRisk_06(unittest.TestCase):
             [x.benchmark_variance
              for x in self.metrics_06.six_month_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['6-month'])
-        np.testing.assert_almost_equa(
+        np.testing.assert_almost_equal(
             [x.benchmark_variance
              for x in self.metrics_06.year_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_BENCHMARK_VARIANCE['year'])
