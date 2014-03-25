@@ -21,7 +21,7 @@ import pandas as pd
 
 from zipline.data.loader import load_market_data
 from zipline.utils import tradingcalendar
-from zipline.utils.tradingcalendar import get_early_closes
+from zipline.utils.tradingcalendar import USEquitiesTradingCalendar
 
 
 log = logbook.Logger('Trading')
@@ -80,8 +80,9 @@ class TradingEnvironment(object):
         load=None,
         bm_symbol='^GSPC',
         exchange_tz="US/Eastern",
-        max_date=None,
-        trading_calendar_cls=trading_calendar_cls,
+        start_date=None,
+        end_date=None,
+        trading_calendar_cls=USEquitiesTradingCalendar,
     ):
         self.prev_environment = self
         self.bm_symbol = bm_symbol
@@ -92,30 +93,21 @@ class TradingEnvironment(object):
             load(self.bm_symbol)
 
         self.treasury_curves = pd.DataFrame(treasury_curves_map).T
-        if max_date:
-            self.treasury_curves = self.treasury_curves.ix[:max_date, :]
+        self.treasury_curves = self.treasury_curves.ix[start_date:end_date, :]
 
         self.exchange_tz = exchange_tz
 
-        start = None
-        end = None
-        self.trading_calendar = trading_calendar_cls(start=start, end=end)
+        self.trading_calendar = trading_calendar_cls(start=start_date,
+                                                     end=end_date)
 
-        bi = self.benchmark_returns.index
-
-        if max_date:
-            self.trading_days = self.trading_calender.trading_days
-        else:
-            max_date = bi.index[-1]
+        self.trading_days = self.trading_calender.trading_days
 
         self.first_trading_day = self.trading_days[0]
         self.last_trading_day = self.trading_days[-1]
 
-        self.early_closes = get_early_closes(self.first_trading_day,
-                                             self.last_trading_day)
+        self.early_closes = self.trading_environment.early_closes
 
-        self.open_and_closes = tradingcalendar.open_and_closes.ix[
-            self.trading_days]
+        self.open_and_closes = self.trading_environment.open_and_closes
 
     def __enter__(self, *args, **kwargs):
         global environment
