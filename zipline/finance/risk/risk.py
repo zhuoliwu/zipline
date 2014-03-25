@@ -111,7 +111,7 @@ def downside_risk(algorithm_returns, mean_returns, normalization_factor):
     return np.std(downside_diff) * math.sqrt(normalization_factor)
 
 
-def sortino_ratio(algorithm_returns, algorithm_period_return, mar):
+def sortino_ratio(algorithm_period_return, treasury_period_return, mar):
     """
     http://en.wikipedia.org/wiki/Sortino_ratio
 
@@ -125,17 +125,10 @@ def sortino_ratio(algorithm_returns, algorithm_period_return, mar):
     Returns:
         float. The Sortino ratio.
     """
-    if len(algorithm_returns) == 0:
+    if zp_math.tolerant_equals(mar, 0):
         return 0.0
 
-    rets = algorithm_returns
-    downside = (rets[rets < mar] - mar) ** 2
-    dr = np.sqrt(downside.sum() / len(rets))
-
-    if zp_math.tolerant_equals(dr, 0):
-        return 0.0
-
-    return (algorithm_period_return - mar) / dr
+    return (algorithm_period_return - treasury_period_return) / mar
 
 
 def information_ratio(algorithm_returns, benchmark_returns):

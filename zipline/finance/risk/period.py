@@ -30,6 +30,7 @@ from . import risk
 from . risk import (
     alpha,
     check_entry,
+    downside_risk,
     information_ratio,
     sharpe_ratio,
     sortino_ratio,
@@ -90,6 +91,8 @@ class RiskMetricsPeriod(object):
             raise Exception(message)
 
         self.num_trading_days = len(self.benchmark_returns)
+        self.mean_returns = self.algorithm_returns / self.num_trading_days
+
         self.benchmark_volatility = self.calculate_volatility(
             self.benchmark_returns)
         self.algorithm_volatility = self.calculate_volatility(
@@ -195,15 +198,17 @@ class RiskMetricsPeriod(object):
                             self.algorithm_period_returns,
                             self.treasury_period_return)
 
-    def calculate_sortino(self, mar=None):
+    def calculate_sortino(self):
         """
         http://en.wikipedia.org/wiki/Sortino_ratio
         """
-        if mar is None:
-            mar = self.treasury_period_return
+        print self.num_trading_days
+        mar = downside_risk(self.algorithm_returns,
+                            self.mean_returns,
+                            self.num_trading_days)
 
-        return sortino_ratio(self.algorithm_returns,
-                             self.algorithm_period_returns,
+        return sortino_ratio(self.algorithm_period_returns,
+                             self.treasury_period_return,
                              mar)
 
     def calculate_information(self):
