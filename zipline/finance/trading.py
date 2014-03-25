@@ -20,7 +20,6 @@ import datetime
 import pandas as pd
 
 from zipline.data.loader import load_market_data
-from zipline.utils import tradingcalendar
 from zipline.utils.tradingcalendar import USEquitiesTradingCalendar
 
 
@@ -214,7 +213,7 @@ class SimulationParameters(object):
         global environment
         if not environment:
             # This is the global environment for trading simulation.
-            environment = TradingEnvironment()
+            environment = TradingEnvironment(period_start, period_end)
 
         self.period_start = period_start
         self.period_end = period_end
