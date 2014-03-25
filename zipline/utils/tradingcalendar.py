@@ -80,6 +80,7 @@ class TradingCalendar(with_metaclass(abc.ABCMeta)):
         self.end = canonicalize_datetime(end)
         self._non_trading_days = None
         self._trading_day = None
+        self._trading_days = None
         self.open_time = (9, 31)
         self.close_time = (16, 0)
         self.early_close_time = (13, 0)
