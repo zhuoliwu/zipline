@@ -31,7 +31,8 @@ from zipline.protocol import (
     DATASOURCE_TYPE
 )
 from zipline.gens.utils import hash_args
-from zipline.utils.tradingcalendar import trading_days
+
+from zipline.finance import trading
 
 
 def create_trade(sid, price, amount, datetime, source_id="test_factory"):
@@ -81,7 +82,7 @@ def date_gen(start=datetime(2006, 6, 6, 12, tzinfo=pytz.utc),
         cur = cur + delta
         cur_midnight = cur.replace(hour=0, minute=0, second=0, microsecond=0)
         # skip over any non-trading days
-        while cur_midnight not in trading_days:
+        while cur_midnight not in trading.environment.trading_days:
             cur = cur + one_day
             cur_midnight = cur.replace(hour=0, minute=0, second=0,
                                        microsecond=0)
