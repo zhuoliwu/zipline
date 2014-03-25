@@ -49,7 +49,12 @@ def create_simulation_parameters(year=2006, start=None, end=None,
         start = datetime(year, 1, 1, tzinfo=pytz.utc)
     if end is None:
         if num_days:
-            trading.environment = trading.TradingEnvironment(load=load)
+            calendar_days = int(365.0 / 252 * num_days)
+            calendar_end_date = start + timedelta(days=calendar_days)
+            trading.environment = trading.TradingEnvironment(
+                load=load,
+                start_date=start,
+                end_date=calendar_end_date)
             start_index = trading.environment.trading_days.searchsorted(
                 start)
             end = trading.environment.trading_days[start_index + num_days - 1]
@@ -105,7 +110,10 @@ def get_next_trading_dt(current, interval):
         next_dt = next_dt + interval
         next_dt = pd.Timestamp(next_dt, tz=trading.environment.exchange_tz)
         next_dt_utc = next_dt.tz_convert('UTC')
+
         if trading.environment.is_market_hours(next_dt_utc):
+            break
+        if next_dt_utc > trading.environment.trading_days[-1]:
             break
         next_dt = next_dt_utc.tz_convert(trading.environment.exchange_tz)
 
