@@ -90,16 +90,17 @@ class TradingEnvironment(object):
 
         self.trading_calendar = trading_calendar_cls(start=start_date,
                                                      end=end_date)
+        self.trading_days = self.trading_calender.trading_days
 
         self.benchmark_returns, treasury_curves_map = \
-            load(self.bm_symbol, self.trading_calendar.trading_day)
+            load(self.trading_calendar.trading_day,
+                 self.trading_days,
+                 self.bm_symbol)
 
         self.treasury_curves = pd.DataFrame(treasury_curves_map).T
         self.treasury_curves = self.treasury_curves.ix[start_date:end_date, :]
 
         self.exchange_tz = exchange_tz
-
-        self.trading_days = self.trading_calender.trading_days
 
         self.first_trading_day = self.trading_days[0]
         self.last_trading_day = self.trading_days[-1]
