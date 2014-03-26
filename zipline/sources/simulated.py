@@ -23,6 +23,8 @@ from zipline.sources.data_source import DataSource
 from zipline.utils import tradingcalendar as calendar_nyse
 from zipline.gens.utils import hash_args
 
+from zipline.finance import trading
+
 
 class RandomWalkSource(DataSource):
     """RandomWalkSource that emits events with prices that follow a
@@ -82,7 +84,7 @@ class RandomWalkSource(DataSource):
         self.sd = .1
 
         self.open_and_closes = \
-            calendar.open_and_closes[self.start:self.end]
+            trading.environment.open_and_closes[self.start:self.end]
 
         self._raw_data = None
 
