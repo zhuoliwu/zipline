@@ -49,7 +49,9 @@ def create_simulation_parameters(year=2006, start=None, end=None,
         start = datetime(year, 1, 1, tzinfo=pytz.utc)
     if end is None:
         if num_days:
-            calendar_days = int(365.0 / 252 * num_days)
+            # To ensure that the calendar is wide enough to cover the market
+            # days.
+            calendar_days = int(365.0 / 252 * num_days) + 3
             calendar_end_date = start + timedelta(days=calendar_days)
             trading.environment = trading.TradingEnvironment(
                 load=load,
