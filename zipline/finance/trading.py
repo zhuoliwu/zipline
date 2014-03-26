@@ -213,8 +213,8 @@ class SimulationParameters(object):
                  data_frequency='daily'):
         global environment
         # This is the global environment for trading simulation.
-        environment = TradingEnvironment(start_date=period_start,
-                                         end_date=period_end)
+        environment = TradingEnvironment(start_date=period_start.date(),
+                                         end_date=period_end.date())
 
         self.environment = environment
 
