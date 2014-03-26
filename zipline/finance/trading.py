@@ -228,7 +228,8 @@ class SimulationParameters(object):
         assert self.period_start <= self.period_end, \
             "Period start falls after period end."
 
-        assert self.period_start <= environment.last_trading_day, \
+        assert self.period_start.date() <= \
+            environment.last_trading_day.date(), \
             "Period start falls after the last known trading day."
         assert self.period_end >= environment.first_trading_day, \
             "Period end falls before the first known trading day."
