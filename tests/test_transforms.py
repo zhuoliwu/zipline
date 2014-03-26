@@ -286,13 +286,17 @@ import zipline.transforms.ta as ta
 
 
 class TestTALIB(TestCase):
-    def setUp(self):
-        setup_logger(self)
-        sim_params = factory.create_simulation_parameters(
+
+    @classmethod
+    def setUpClass(cls):
+        cls.sim_params = factory.create_simulation_parameters(
             start=datetime(1990, 1, 1, tzinfo=pytz.utc),
             end=datetime(1990, 3, 30, tzinfo=pytz.utc))
+
+    def setUp(self):
+        setup_logger(self)
         self.source, self.panel = \
-            factory.create_test_panel_ohlc_source(sim_params)
+            factory.create_test_panel_ohlc_source(self.sim_params)
 
     @skip
     def test_talib_with_default_params(self):
