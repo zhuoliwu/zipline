@@ -60,7 +60,7 @@ class NoopEventWindow(EventWindow):
 
 class TestEventWindow(TestCase):
     def setUp(self):
-        self.sim_params = factory.create_simulation_parameters()
+        self.sim_params = factory.create_simulation_parameters(year=2012)
 
         setup_logger(self)
 
