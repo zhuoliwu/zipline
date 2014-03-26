@@ -17,12 +17,15 @@ from unittest import TestCase
 from zipline.utils import tradingcalendar
 import pytz
 import datetime
+import pandas as pd
 
 
 class TestTradingCalendar(TestCase):
 
     def setUp(self):
-        pass
+        self.trading_calendar = tradingcalendar.USEquitiesTradingCalendar(
+            start=pd.Timestamp('2002-01-01', tz='UTC'),
+            end=pd.Timestamp('2013-12-31', tz='UTC'))
 
     def check_days(self, env_days, cal_days):
         diff = env_days - cal_days
@@ -55,7 +58,7 @@ class TestTradingCalendar(TestCase):
             2012, 1, 2, tzinfo=pytz.utc)
 
         self.assertNotIn(day_after_new_years_sunday,
-                         tradingcalendar.trading_days,
+                         self.trading_calendar.trading_days,
                          """
 If NYE falls on a weekend, {0} the Monday after is a holiday.
 """.strip().format(day_after_new_years_sunday)
@@ -65,7 +68,7 @@ If NYE falls on a weekend, {0} the Monday after is a holiday.
             2012, 1, 3, tzinfo=pytz.utc)
 
         self.assertIn(first_trading_day_after_new_years_sunday,
-                      tradingcalendar.trading_days,
+                      self.trading_calendar.trading_days,
                       """
 If NYE falls on a weekend, {0} the Tuesday after is the first trading day.
 """.strip().format(first_trading_day_after_new_years_sunday)
@@ -83,7 +86,7 @@ If NYE falls on a weekend, {0} the Tuesday after is the first trading day.
             2013, 1, 1, tzinfo=pytz.utc)
 
         self.assertNotIn(new_years_day,
-                         tradingcalendar.trading_days,
+                         self.trading_calendar.trading_days,
                          """
 If NYE falls during the week, e.g. {0}, it is a holiday.
 """.strip().format(new_years_day)
@@ -93,7 +96,7 @@ If NYE falls during the week, e.g. {0}, it is a holiday.
             2013, 1, 2, tzinfo=pytz.utc)
 
         self.assertIn(first_trading_day_after_new_years,
-                      tradingcalendar.trading_days,
+                      self.trading_calendar.trading_days,
                       """
 If the day after NYE falls during the week, {0} \
 is the first trading day.
@@ -115,7 +118,7 @@ is the first trading day.
             2005, 11, 24, tzinfo=pytz.utc)
 
         self.assertNotIn(thanksgiving_with_four_weeks,
-                         tradingcalendar.trading_days,
+                         self.trading_calendar.trading_days,
                          """
 If Nov has 4 Thursdays, {0} Thanksgiving is the last Thursady.
 """.strip().format(thanksgiving_with_four_weeks)
@@ -132,7 +135,7 @@ If Nov has 4 Thursdays, {0} Thanksgiving is the last Thursady.
             2006, 11, 23, tzinfo=pytz.utc)
 
         self.assertNotIn(thanksgiving_with_five_weeks,
-                         tradingcalendar.trading_days,
+                         self.trading_calendar.trading_days,
                          """
 If Nov has 5 Thursdays, {0} Thanksgiving is not the last week.
 """.strip().format(thanksgiving_with_five_weeks)
@@ -142,17 +145,14 @@ If Nov has 5 Thursdays, {0} Thanksgiving is not the last week.
             2012, 1, 3, tzinfo=pytz.utc)
 
         self.assertIn(first_trading_day_after_new_years_sunday,
-                      tradingcalendar.trading_days,
+                      self.trading_calendar.trading_days,
                       """
 If NYE falls on a weekend, {0} the Tuesday after is the first trading day.
 """.strip().format(first_trading_day_after_new_years_sunday)
         )
 
     def test_day_after_thanksgiving(self):
-        early_closes = tradingcalendar.get_early_closes(
-            tradingcalendar.start,
-            tradingcalendar.end.replace(year=tradingcalendar.end.year + 1)
-        )
+        early_closes = self.trading_calendar.early_closes
 
         #    November 2012
         # Su Mo Tu We Th Fr Sa
@@ -180,10 +180,8 @@ If NYE falls on a weekend, {0} the Tuesday after is the first trading day.
         Independence Day on Thursday.  Since then, the early close is on
         Wednesday.
         """
-        early_closes = tradingcalendar.get_early_closes(
-            tradingcalendar.start,
-            tradingcalendar.end.replace(year=tradingcalendar.end.year + 1)
-        )
+        early_closes = self.trading_calendar.early_closes
+
         #      July 2002
         # Su Mo Tu We Th Fr Sa
         #     1  2  3  4  5  6
