@@ -315,10 +315,10 @@ def create_test_panel_ohlc_source(sim_params=None):
     end = sim_params.last_close \
         if sim_params else pd.datetime(1990, 1, 8, 0, 0, 0, 0, pytz.utc)
 
-    if trading.environment is None:
-        trading.environment = trading.TradingEnvironment()
+    if not sim_params:
+        trading.environment = trading.TradingEnvironment(start=start, end=end)
 
-    index = trading.environment.days_in_range(start, end)
+    index = trading.environment.trading_days
     price = np.arange(0, len(index)) + 100
     high = price * 1.05
     low = price * 0.95
