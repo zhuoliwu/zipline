@@ -58,6 +58,10 @@ def get_open_and_closes(start, end, open_time, close_time,
                         early_close_time, early_close_dates, trading_days):
     open_and_closes = pd.DataFrame(index=trading_days,
                                    columns=('market_open', 'market_close'))
+
+    if not len(trading_days):
+        return open_and_closes
+
     get_o_and_c = partial(get_open_and_close,
                           early_closes=early_close_dates,
                           open_time=open_time,
