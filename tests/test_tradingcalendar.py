@@ -15,15 +15,10 @@
 
 from unittest import TestCase
 from zipline.utils import tradingcalendar
-from zipline.utils import tradingcalendar_lse
-from zipline.utils import tradingcalendar_tse
-from zipline.utils import tradingcalendar_bmf
 import pytz
 import datetime
-from zipline.finance.trading import TradingEnvironment
 import pandas as pd
 from pandas import DatetimeIndex
-from nose.tools import nottest
 
 
 class TestTradingCalendar(TestCase):
@@ -31,61 +26,6 @@ class TestTradingCalendar(TestCase):
     def setUp(self):
         today = pd.Timestamp('today', tz='UTC')
         self.end = DatetimeIndex([today])
-
-    @nottest
-    def test_calendar_vs_environment(self):
-        """
-        test_calendar_vs_environment checks whether the
-        historical data from yahoo matches our rule based system.
-        handy, if not canonical, reference:
-        http://www.chronos-st.org/NYSE_Observed_Holidays-1885-Present.html
-        """
-
-        env = TradingEnvironment()
-        env_start_index = \
-            env.trading_days.searchsorted(tradingcalendar.start)
-        env_days = env.trading_days[env_start_index:]
-        cal_days = tradingcalendar.trading_days
-        self.check_days(env_days, cal_days)
-
-    @nottest
-    def test_lse_calendar_vs_environment(self):
-        env = TradingEnvironment(
-            bm_symbol='^FTSE',
-            exchange_tz='Europe/London'
-        )
-
-        env_start_index = \
-            env.trading_days.searchsorted(tradingcalendar_lse.start)
-        env_days = env.trading_days[env_start_index:]
-        cal_days = tradingcalendar_lse.trading_days
-        self.check_days(env_days, cal_days)
-
-    @nottest
-    def test_tse_calendar_vs_environment(self):
-        env = TradingEnvironment(
-            bm_symbol='^GSPTSE',
-            exchange_tz='US/Eastern'
-        )
-
-        env_start_index = \
-            env.trading_days.searchsorted(tradingcalendar_tse.start)
-        env_days = env.trading_days[env_start_index:]
-        cal_days = tradingcalendar_tse.trading_days
-        self.check_days(env_days, cal_days)
-
-    @nottest
-    def test_bmf_calendar_vs_environment(self):
-        env = TradingEnvironment(
-            bm_symbol='^BVSP',
-            exchange_tz='America/Sao_Paulo'
-        )
-
-        env_start_index = \
-            env.trading_days.searchsorted(tradingcalendar_bmf.start)
-        env_days = env.trading_days[env_start_index:]
-        cal_days = tradingcalendar_bmf.trading_days
-        self.check_days(env_days, cal_days)
 
     def check_days(self, env_days, cal_days):
         diff = env_days - cal_days
