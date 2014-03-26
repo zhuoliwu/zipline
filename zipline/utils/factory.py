@@ -71,37 +71,6 @@ def create_simulation_parameters(year=2006, start=None, end=None,
     return sim_params
 
 
-def create_random_simulation_parameters():
-    trading.environment = trading.TradingEnvironment()
-    treasury_curves = trading.environment.treasury_curves
-
-    for n in range(100):
-
-        random_index = random.randint(
-            0,
-            len(treasury_curves) - 1
-        )
-
-        start_dt = treasury_curves.index[random_index]
-        end_dt = start_dt + timedelta(days=365)
-
-        now = datetime.utcnow().replace(tzinfo=pytz.utc)
-
-        if end_dt <= now:
-            break
-
-    assert end_dt <= now, """
-failed to find a suitable daterange after 100 attempts. please double
-check treasury and benchmark data in findb, and re-run the test."""
-
-    sim_params = SimulationParameters(
-        period_start=start_dt,
-        period_end=end_dt
-    )
-
-    return sim_params, start_dt, end_dt
-
-
 def get_next_trading_dt(current, interval):
     next_dt = pd.Timestamp(current).tz_convert(trading.environment.exchange_tz)
 

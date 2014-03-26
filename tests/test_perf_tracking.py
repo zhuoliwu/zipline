@@ -38,7 +38,7 @@ from zipline.finance.blotter import Order
 from zipline.finance.commission import PerShare, PerTrade, PerDollar
 from zipline.finance import trading
 from zipline.protocol import DATASOURCE_TYPE
-from zipline.utils.factory import create_random_simulation_parameters
+from zipline.utils.factory import create_simulation_parameters
 import zipline.protocol
 from zipline.protocol import Event
 
@@ -96,8 +96,7 @@ def calculate_results(host, events):
 
 class TestSplitPerformance(unittest.TestCase):
     def setUp(self):
-        self.sim_params, self.dt, self.end_dt = \
-            create_random_simulation_parameters()
+        self.sim_params = create_simulation_parameters()
 
         # start with $10,000
         self.sim_params.capital_base = 10e3
@@ -590,8 +589,7 @@ class TestDividendPerformanceHolidayStyle(TestDividendPerformance):
 class TestPositionPerformance(unittest.TestCase):
 
     def setUp(self):
-        self.sim_params, self.dt, self.end_dt = \
-            create_random_simulation_parameters()
+        self.sim_params = create_simulation_parameters()
 
         self.benchmark_events = benchmark_events_in_range(self.sim_params)
 
