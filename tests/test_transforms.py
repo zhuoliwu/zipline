@@ -302,20 +302,22 @@ class TestTALIB(TestCase):
         names = [name for name in dir(ta) if name[0].isupper()
                  and name not in BLACKLIST]
 
+        start = datetime(1990, 1, 1, tzinfo=pytz.utc)
+        end = start + timedelta(days=120)
+
+        sim_params = factory.create_simulation_parameters(
+            start=start, end=end)
+
         for name in names:
             print(name)
             zipline_transform = getattr(ta, name)(sid=0)
             talib_fn = getattr(talib.abstract, name)
 
-            start = datetime(1990, 1, 1, tzinfo=pytz.utc)
-            end = start + timedelta(days=zipline_transform.lookback + 10)
-            sim_params = factory.create_simulation_parameters(
-                start=start, end=end)
             source, panel = \
                 factory.create_test_panel_ohlc_source(sim_params)
 
             algo = TALIBAlgorithm(talib=zipline_transform)
-            algo.run(source)
+            algo.run(source, sim_params=sim_params)
 
             zipline_result = np.array(
                 algo.talib_results[zipline_transform][-1])
