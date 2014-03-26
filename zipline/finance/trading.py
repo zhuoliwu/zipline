@@ -102,8 +102,12 @@ class TradingEnvironment(object):
 
         self.exchange_tz = exchange_tz
 
-        self.first_trading_day = self.trading_days[0]
-        self.last_trading_day = self.trading_days[-1]
+        self.first_trading_day = None
+        self.last_trading_day = None
+
+        if len(self.trading_days):
+            self.first_trading_day = self.trading_days[0]
+            self.last_trading_day = self.trading_days[-1]
 
         self.early_closes = self.trading_calendar.early_closes
 
