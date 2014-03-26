@@ -17,15 +17,12 @@ from unittest import TestCase
 from zipline.utils import tradingcalendar
 import pytz
 import datetime
-import pandas as pd
-from pandas import DatetimeIndex
 
 
 class TestTradingCalendar(TestCase):
 
     def setUp(self):
-        today = pd.Timestamp('today', tz='UTC')
-        self.end = DatetimeIndex([today])
+        pass
 
     def check_days(self, env_days, cal_days):
         diff = env_days - cal_days
