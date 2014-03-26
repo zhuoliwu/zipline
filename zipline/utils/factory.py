@@ -285,12 +285,14 @@ def create_test_df_source(sim_params=None, bars='daily'):
         index = sim_params.trading_days
     else:
         if trading.environment is None:
-            trading.environment = trading.TradingEnvironment()
+            start = pd.datetime(1990, 1, 3, 0, 0, 0, 0, pytz.utc)
+            end = pd.datetime(1990, 1, 8, 0, 0, 0, 0, pytz.utc)
 
-        start = pd.datetime(1990, 1, 3, 0, 0, 0, 0, pytz.utc)
-        end = pd.datetime(1990, 1, 8, 0, 0, 0, 0, pytz.utc)
+            trading.environment = trading.TradingEnvironment(
+                start_date=start,
+                end_date=end)
 
-        days = trading.environment.days_in_range(start, end)
+        days = trading.environment.trading_days
 
         if bars == 'daily':
             index = days
@@ -316,9 +318,11 @@ def create_test_panel_source(sim_params=None):
         if sim_params else pd.datetime(1990, 1, 8, 0, 0, 0, 0, pytz.utc)
 
     if trading.environment is None:
-        trading.environment = trading.TradingEnvironment()
+        trading.environment = trading.TradingEnvironment(
+            start_date=start,
+            end_date=end)
 
-    index = trading.environment.days_in_range(start, end)
+    index = trading.environment.trading_days
 
     price = np.arange(0, len(index))
     volume = np.ones(len(index)) * 1000
