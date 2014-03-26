@@ -261,7 +261,8 @@ def choose_treasury(select_treasury, treasury_curves, start_date, end_date,
 
         # Find rightmost value less than or equal to end_day
         i = search_days.searchsorted(end_day)
-        for prev_day in search_days[i - 1::-1]:
+        start_index = i - 1 if i else 0
+        for prev_day in search_days[start_index::-1]:
             rate = get_treasury_rate(treasury_curves,
                                      treasury_duration,
                                      prev_day)
