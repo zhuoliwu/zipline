@@ -198,18 +198,32 @@ class TestRisk(unittest.TestCase):
             [x.sharpe for x in self.metrics_06.year_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_SHARPE['year'])
 
+    def test_algorithm_downside_risk_06(self):
+        np.testing.assert_almost_equal(
+            [x.downside_risk for x in self.metrics_06.month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['Monthly'])
+        np.testing.assert_almost_equal(
+            [x.downside_risk for x in self.metrics_06.three_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['3-Month'])
+        np.testing.assert_almost_equal(
+            [x.downside_risk for x in self.metrics_06.six_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['6-month'])
+        np.testing.assert_almost_equal(
+            [x.downside_risk for x in self.metrics_06.year_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['year'])
+
     def test_algorithm_sortino_06(self):
         np.testing.assert_almost_equal(
-            [x.sharpe for x in self.metrics_06.month_periods],
+            [x.sortino for x in self.metrics_06.month_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['Monthly'])
         np.testing.assert_almost_equal(
-            [x.sharpe for x in self.metrics_06.three_month_periods],
+            [x.sortino for x in self.metrics_06.three_month_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['3-Month'])
         np.testing.assert_almost_equal(
-            [x.sharpe for x in self.metrics_06.six_month_periods],
+            [x.sortino for x in self.metrics_06.six_month_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['6-month'])
         np.testing.assert_almost_equal(
-            [x.sharpe for x in self.metrics_06.year_periods],
+            [x.sortino for x in self.metrics_06.year_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['year'])
 
     def test_algorithm_information_06(self):

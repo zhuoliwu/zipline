@@ -225,6 +225,13 @@ class AnswerKey(object):
             'year': DataIndex('Sim Period', 'BD', 34, 34),
         },
 
+        'ALGORITHM_PERIOD_DOWNSIDE_RISK': {
+            'Monthly': DataIndex('Sim Period', 'BI', 23, 34),
+            '3-Month': DataIndex('Sim Period', 'BJ', 25, 34),
+            '6-month': DataIndex('Sim Period', 'BK', 28, 34),
+            'year': DataIndex('Sim Period', 'BL', 34, 34),
+        },
+
         'ALGORITHM_PERIOD_SORTINO': {
             'Monthly': DataIndex('Sim Period', 'BM', 23, 34),
             '3-Month': DataIndex('Sim Period', 'BN', 25, 34),
