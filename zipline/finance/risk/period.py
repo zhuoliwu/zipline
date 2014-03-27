@@ -91,7 +91,15 @@ class RiskMetricsPeriod(object):
             raise Exception(message)
 
         self.num_trading_days = len(self.benchmark_returns)
-        self.mean_returns = self.algorithm_returns / self.num_trading_days
+        self.trading_day_counts = pd.stats.moments.rolling_count(
+            self.algorithm_returns, self.num_trading_days)
+        self.algorithm_cumulative_returns = \
+            (1 + self.algorithm_returns).cumprod() - 1
+        self.mean_algorithm_returns = (
+            self.algorithm_cumulative_returns
+            /
+            self.trading_day_counts
+        )
 
         self.benchmark_volatility = self.calculate_volatility(
             self.benchmark_returns)
@@ -202,11 +210,11 @@ class RiskMetricsPeriod(object):
         """
         http://en.wikipedia.org/wiki/Sortino_ratio
         """
-        print self.num_trading_days
         mar = downside_risk(self.algorithm_returns,
-                            self.mean_returns,
+                            self.mean_algorithm_returns,
                             self.num_trading_days)
-
+        # Hold on to downside risk for debugging purposes.
+        self.downside_risk = mar
         return sortino_ratio(self.algorithm_period_returns,
                              self.treasury_period_return,
                              mar)

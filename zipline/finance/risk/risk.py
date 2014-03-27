@@ -105,8 +105,8 @@ def sharpe_ratio(algorithm_volatility, algorithm_return, treasury_return):
 
 
 def downside_risk(algorithm_returns, mean_returns, normalization_factor):
-    rets = algorithm_returns
-    mar = mean_returns
+    rets = algorithm_returns.round(8)
+    mar = mean_returns.round(8)
     downside_diff = (rets[rets < mar] - mar[rets < mar])
     return np.std(downside_diff) * math.sqrt(normalization_factor)
 
