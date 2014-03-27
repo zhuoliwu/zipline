@@ -199,44 +199,18 @@ class TestRisk(unittest.TestCase):
             ANSWER_KEY.ALGORITHM_PERIOD_SHARPE['year'])
 
     def test_algorithm_sortino_06(self):
-        self.assertEqual([round(x.sortino, 3)
-                          for x in self.metrics_06.month_periods],
-                         [4.491,
-                          -2.842,
-                          -2.052,
-                          3.898,
-                          7.023,
-                          -8.532,
-                          3.079,
-                          -0.354,
-                          -1.125,
-                          3.009,
-                          3.277,
-                          -3.122])
-        self.assertEqual([round(x.sortino, 3)
-                          for x in self.metrics_06.three_month_periods],
-                         [-0.769,
-                          -1.043,
-                          6.677,
-                          -2.77,
-                          -3.209,
-                          -6.769,
-                          1.253,
-                          1.085,
-                          3.659,
-                          1.674])
-        self.assertEqual([round(x.sortino, 3)
-                          for x in self.metrics_06.six_month_periods],
-                         [-2.728,
-                          -3.258,
-                          -1.84,
-                          -1.366,
-                          -1.845,
-                          -3.415,
-                          2.238])
-        self.assertEqual([round(x.sortino, 3)
-                          for x in self.metrics_06.year_periods],
-                         [-0.524])
+        np.testing.assert_almost_equal(
+            [x.sharpe for x in self.metrics_06.month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['Monthly'])
+        np.testing.assert_almost_equal(
+            [x.sharpe for x in self.metrics_06.three_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['3-Month'])
+        np.testing.assert_almost_equal(
+            [x.sharpe for x in self.metrics_06.six_month_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['6-month'])
+        np.testing.assert_almost_equal(
+            [x.sharpe for x in self.metrics_06.year_periods],
+            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['year'])
 
     def test_algorithm_information_06(self):
         self.assertEqual([round(x.information, 3)
