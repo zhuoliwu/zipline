@@ -108,6 +108,8 @@ def downside_risk(algorithm_returns, mean_returns, normalization_factor):
     rets = algorithm_returns.round(8)
     mar = mean_returns.round(8)
     downside_diff = (rets[rets < mar] - mar[rets < mar])
+    if not downside_diff.any():
+        return 0.0
     return np.std(downside_diff) * math.sqrt(normalization_factor)
 
 
