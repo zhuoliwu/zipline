@@ -198,45 +198,45 @@ class AnswerKey(object):
         },
 
         'ALGORITHM_PERIOD_BETA': {
-            'Monthly': DataIndex('Sim Period', 'AK', 23, 34),
-            '3-Month': DataIndex('Sim Period', 'AL', 25, 34),
-            '6-month': DataIndex('Sim Period', 'AM', 28, 34),
-            'year': DataIndex('Sim Period', 'AN', 34, 34),
+            'Monthly': DataIndex('Sim Period', 'AR', 23, 34),
+            '3-Month': DataIndex('Sim Period', 'AS', 25, 34),
+            '6-month': DataIndex('Sim Period', 'AT', 28, 34),
+            'year': DataIndex('Sim Period', 'AU', 34, 34),
         },
 
         'ALGORITHM_PERIOD_ALPHA': {
-            'Monthly': DataIndex('Sim Period', 'AO', 23, 34),
-            '3-Month': DataIndex('Sim Period', 'AP', 25, 34),
-            '6-month': DataIndex('Sim Period', 'AQ', 28, 34),
-            'year': DataIndex('Sim Period', 'AR', 34, 34),
+            'Monthly': DataIndex('Sim Period', 'AV', 23, 34),
+            '3-Month': DataIndex('Sim Period', 'AW', 25, 34),
+            '6-month': DataIndex('Sim Period', 'AX', 28, 34),
+            'year': DataIndex('Sim Period', 'AY', 34, 34),
         },
 
         'ALGORITHM_PERIOD_BENCHMARK_VARIANCE': {
-            'Monthly': DataIndex('Sim Period', 'BE', 23, 34),
-            '3-Month': DataIndex('Sim Period', 'BF', 25, 34),
-            '6-month': DataIndex('Sim Period', 'BG', 28, 34),
-            'year': DataIndex('Sim Period', 'BH', 34, 34),
+            'Monthly': DataIndex('Sim Period', 'BL', 23, 34),
+            '3-Month': DataIndex('Sim Period', 'BM', 25, 34),
+            '6-month': DataIndex('Sim Period', 'BN', 28, 34),
+            'year': DataIndex('Sim Period', 'BO', 34, 34),
         },
 
         'ALGORITHM_PERIOD_COVARIANCE': {
-            'Monthly': DataIndex('Sim Period', 'BA', 23, 34),
-            '3-Month': DataIndex('Sim Period', 'BB', 25, 34),
-            '6-month': DataIndex('Sim Period', 'BC', 28, 34),
-            'year': DataIndex('Sim Period', 'BD', 34, 34),
+            'Monthly': DataIndex('Sim Period', 'BH', 23, 34),
+            '3-Month': DataIndex('Sim Period', 'BI', 25, 34),
+            '6-month': DataIndex('Sim Period', 'BJ', 28, 34),
+            'year': DataIndex('Sim Period', 'BK', 34, 34),
         },
 
         'ALGORITHM_PERIOD_DOWNSIDE_RISK': {
-            'Monthly': DataIndex('Sim Period', 'BI', 23, 34),
-            '3-Month': DataIndex('Sim Period', 'BJ', 25, 34),
-            '6-month': DataIndex('Sim Period', 'BK', 28, 34),
-            'year': DataIndex('Sim Period', 'BL', 34, 34),
+            'Monthly': DataIndex('Sim Period', 'BP', 23, 34),
+            '3-Month': DataIndex('Sim Period', 'BQ', 25, 34),
+            '6-month': DataIndex('Sim Period', 'BR', 28, 34),
+            'year': DataIndex('Sim Period', 'BS', 34, 34),
         },
 
         'ALGORITHM_PERIOD_SORTINO': {
-            'Monthly': DataIndex('Sim Period', 'BM', 23, 34),
-            '3-Month': DataIndex('Sim Period', 'BN', 25, 34),
-            '6-month': DataIndex('Sim Period', 'BO', 28, 34),
-            'year': DataIndex('Sim Period', 'BP', 34, 34),
+            'Monthly': DataIndex('Sim Period', 'BT', 23, 34),
+            '3-Month': DataIndex('Sim Period', 'BU', 25, 34),
+            '6-month': DataIndex('Sim Period', 'BV', 28, 34),
+            'year': DataIndex('Sim Period', 'BW', 34, 34),
         },
 
         'ALGORITHM_RETURN_VALUES': DataIndex(
