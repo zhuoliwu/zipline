@@ -93,13 +93,14 @@ class RiskMetricsPeriod(object):
         self.num_trading_days = len(self.benchmark_returns)
         self.trading_day_counts = pd.stats.moments.rolling_count(
             self.algorithm_returns, self.num_trading_days)
-        self.algorithm_cumulative_returns = \
-            (1 + self.algorithm_returns).cumprod() - 1
-        self.mean_algorithm_returns = (
-            self.algorithm_cumulative_returns
-            /
-            self.trading_day_counts
-        )
+        self.mean_algorithm_returns = pd.Series(
+            index=self.algorithm_returns.index)
+        for dt, ret in self.algorithm_returns.iterkv():
+            self.mean_algorithm_returns[dt] = (
+                self.algorithm_returns[:dt].sum()
+                /
+                self.trading_day_counts[dt]
+            )
 
         self.benchmark_volatility = self.calculate_volatility(
             self.benchmark_returns)
