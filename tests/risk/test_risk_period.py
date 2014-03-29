@@ -201,30 +201,38 @@ class TestRisk(unittest.TestCase):
     def test_algorithm_downside_risk_06(self):
         np.testing.assert_almost_equal(
             [x.downside_risk for x in self.metrics_06.month_periods],
-            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['Monthly'])
+            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['Monthly'],
+            decimal=2)
         np.testing.assert_almost_equal(
             [x.downside_risk for x in self.metrics_06.three_month_periods],
-            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['3-Month'])
+            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['3-Month'],
+            decimal=2)
         np.testing.assert_almost_equal(
             [x.downside_risk for x in self.metrics_06.six_month_periods],
-            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['6-month'])
+            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['6-month'],
+            decimal=2)
         np.testing.assert_almost_equal(
             [x.downside_risk for x in self.metrics_06.year_periods],
-            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['year'])
+            ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['year'],
+            decimal=2)
 
     def test_algorithm_sortino_06(self):
         np.testing.assert_almost_equal(
             [x.sortino for x in self.metrics_06.month_periods],
-            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['Monthly'])
+            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['Monthly'],
+            decimal=4)
         np.testing.assert_almost_equal(
             [x.sortino for x in self.metrics_06.three_month_periods],
-            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['3-Month'])
+            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['3-Month'],
+            decimal=4)
         np.testing.assert_almost_equal(
             [x.sortino for x in self.metrics_06.six_month_periods],
-            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['6-month'])
+            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['6-month'],
+            decimal=4)
         np.testing.assert_almost_equal(
             [x.sortino for x in self.metrics_06.year_periods],
-            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['year'])
+            ANSWER_KEY.ALGORITHM_PERIOD_SORTINO['year'],
+            decimal=4)
 
     def test_algorithm_information_06(self):
         self.assertEqual([round(x.information, 3)
