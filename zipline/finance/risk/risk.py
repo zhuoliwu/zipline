@@ -110,7 +110,8 @@ def downside_risk(algorithm_returns, mean_returns, normalization_factor):
     downside_diff = (rets[rets < mar] - mar[rets < mar])
     if not downside_diff.any():
         return 0.0
-    return np.std(downside_diff) * math.sqrt(normalization_factor)
+    import pprint; import nose; nose.tools.set_trace()
+    return np.std(downside_diff, ddof=1) * math.sqrt(normalization_factor)
 
 
 def sortino_ratio(algorithm_period_return, treasury_period_return, mar):

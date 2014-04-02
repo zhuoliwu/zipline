@@ -202,19 +202,19 @@ class TestRisk(unittest.TestCase):
         np.testing.assert_almost_equal(
             [x.downside_risk for x in self.metrics_06.month_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['Monthly'],
-            decimal=2)
+            decimal=3)
         np.testing.assert_almost_equal(
             [x.downside_risk for x in self.metrics_06.three_month_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['3-Month'],
-            decimal=2)
+            decimal=3)
         np.testing.assert_almost_equal(
             [x.downside_risk for x in self.metrics_06.six_month_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['6-month'],
-            decimal=2)
+            decimal=3)
         np.testing.assert_almost_equal(
             [x.downside_risk for x in self.metrics_06.year_periods],
             ANSWER_KEY.ALGORITHM_PERIOD_DOWNSIDE_RISK['year'],
-            decimal=2)
+            decimal=3)
 
     def test_algorithm_sortino_06(self):
         np.testing.assert_almost_equal(
