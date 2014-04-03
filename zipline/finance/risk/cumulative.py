@@ -482,7 +482,8 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
     def calculate_downside_risk(self):
         return downside_risk(self.algorithm_returns,
                              self.mean_returns,
-                             252)
+                             252,
+                             ddof=0)
 
     def calculate_beta(self):
         """
