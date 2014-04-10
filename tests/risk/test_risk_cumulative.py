@@ -71,7 +71,6 @@ class TestRisk(unittest.TestCase):
             np.testing.assert_almost_equal(
                 self.cumulative_metrics_06.metrics.sharpe[dt],
                 value,
-                decimal=2,
                 err_msg="Mismatch at %s" % (dt,))
 
     def test_downside_risk_06(self):
@@ -79,7 +78,6 @@ class TestRisk(unittest.TestCase):
             np.testing.assert_almost_equal(
                 value,
                 self.cumulative_metrics_06.metrics.downside_risk[dt],
-                decimal=2,
                 err_msg="Mismatch at %s" % (dt,))
 
     def test_sortino_06(self):
@@ -87,7 +85,7 @@ class TestRisk(unittest.TestCase):
             np.testing.assert_almost_equal(
                 self.cumulative_metrics_06.metrics.sortino[dt],
                 value,
-                decimal=2,
+                decimal=4,
                 err_msg="Mismatch at %s" % (dt,))
 
     def test_information_06(self):
@@ -95,7 +93,6 @@ class TestRisk(unittest.TestCase):
             np.testing.assert_almost_equal(
                 value,
                 self.cumulative_metrics_06.metrics.information[dt],
-                decimal=2,
                 err_msg="Mismatch at %s" % (dt,))
 
     def test_alpha_06(self):
@@ -103,7 +100,6 @@ class TestRisk(unittest.TestCase):
             np.testing.assert_almost_equal(
                 self.cumulative_metrics_06.metrics.alpha[dt],
                 value,
-                decimal=2,
                 err_msg="Mismatch at %s" % (dt,))
 
     def test_beta_06(self):
@@ -111,7 +107,6 @@ class TestRisk(unittest.TestCase):
             np.testing.assert_almost_equal(
                 value,
                 self.cumulative_metrics_06.metrics.beta[dt],
-                decimal=2,
                 err_msg="Mismatch at %s" % (dt,))
 
     def test_max_drawdown_06(self):
@@ -119,5 +114,4 @@ class TestRisk(unittest.TestCase):
             np.testing.assert_almost_equal(
                 self.cumulative_metrics_06.max_drawdowns[dt],
                 value,
-                decimal=2,
                 err_msg="Mismatch at %s" % (dt,))
