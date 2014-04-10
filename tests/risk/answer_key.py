@@ -255,16 +255,16 @@ class AnswerKey(object):
             'Sim Cumulative', 'V', 4, 254),
 
         'CUMULATIVE_INFORMATION': DataIndex(
-            'Sim Cumulative', 'Y', 4, 254),
+            'Sim Cumulative', 'AA', 4, 254),
 
         'CUMULATIVE_BETA': DataIndex(
-            'Sim Cumulative', 'AB', 4, 254),
+            'Sim Cumulative', 'AD', 4, 254),
 
         'CUMULATIVE_ALPHA': DataIndex(
-            'Sim Cumulative', 'AC', 4, 254),
+            'Sim Cumulative', 'AE', 4, 254),
 
         'CUMULATIVE_MAX_DRAWDOWN': DataIndex(
-            'Sim Cumulative', 'AF', 4, 254),
+            'Sim Cumulative', 'AH', 4, 254),
 
     }
 
