@@ -104,17 +104,13 @@ def sharpe_ratio(algorithm_volatility, algorithm_return, treasury_return):
     return (algorithm_return - treasury_return) / algorithm_volatility
 
 
-def downside_risk(algorithm_returns, mean_returns, normalization_factor,
-                  ddof):
-    """
-    ddof: 0 for population, 1 for sample
-    """
+def downside_risk(algorithm_returns, mean_returns, normalization_factor):
     rets = algorithm_returns.round(8)
     mar = mean_returns.round(8)
     downside_diff = (rets[rets < mar] - mar[rets < mar])
-    if not downside_diff.any():
+    if len(downside_diff) <= 1:
         return 0.0
-    return np.std(downside_diff, ddof=ddof) * math.sqrt(normalization_factor)
+    return np.std(downside_diff, ddof=1) * math.sqrt(normalization_factor)
 
 
 def sortino_ratio(algorithm_period_return, treasury_period_return, mar):

@@ -477,13 +477,12 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
                      self.metrics.beta[dt])
 
     def calculate_volatility(self, daily_returns):
-        return np.std(daily_returns) * math.sqrt(252)
+        return np.std(daily_returns, ddof=1) * math.sqrt(252)
 
     def calculate_downside_risk(self):
         return downside_risk(self.algorithm_returns,
                              self.mean_returns,
-                             252,
-                             ddof=0)
+                             252)
 
     def calculate_beta(self):
         """

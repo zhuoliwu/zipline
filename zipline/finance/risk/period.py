@@ -213,8 +213,7 @@ class RiskMetricsPeriod(object):
         """
         mar = downside_risk(self.algorithm_returns,
                             self.mean_algorithm_returns,
-                            self.num_trading_days,
-                            ddof=1)
+                            self.num_trading_days)
         # Hold on to downside risk for debugging purposes.
         self.downside_risk = mar
         return sortino_ratio(self.algorithm_period_returns,
