@@ -31,6 +31,7 @@ from . risk import (
     check_entry,
     choose_treasury,
     downside_risk,
+    sharpe_ratio,
 )
 
 log = logbook.Logger('Risk Cumulative')
@@ -38,34 +39,6 @@ log = logbook.Logger('Risk Cumulative')
 
 choose_treasury = functools.partial(choose_treasury, lambda *args: '10year',
                                     compound=False)
-
-
-def sharpe_ratio(algorithm_volatility, annualized_return, treasury_return):
-    """
-    http://en.wikipedia.org/wiki/Sharpe_ratio
-
-    Args:
-        algorithm_volatility (float): Algorithm volatility.
-        algorithm_return (float): Algorithm return percentage.
-        treasury_return (float): Treasury return percentage.
-
-    Returns:
-        float. The Sharpe ratio.
-    """
-    if zp_math.tolerant_equals(algorithm_volatility, 0):
-        return np.nan
-
-    return (
-        (annualized_return - treasury_return)
-        # The square of the annualization factor is in the volatility,
-        # because the volatility is also annualized,
-        # i.e. the sqrt(annual factor) is in the volatility's numerator.
-        # So to have the the correct annualization factor for the
-        # Sharpe value's numerator, which should be the sqrt(annual factor).
-        # The square of the sqrt of the annual factor, i.e. the annual factor
-        # itself, is needed in the numerator to factor out the division by
-        # its square root.
-        / algorithm_volatility)
 
 
 def sortino_ratio(annualized_algorithm_return, treasury_return, downside_risk):
