@@ -32,6 +32,7 @@ from . risk import (
     choose_treasury,
     downside_risk,
     sharpe_ratio,
+    sortino_ratio,
 )
 
 log = logbook.Logger('Risk Cumulative')
@@ -39,26 +40,6 @@ log = logbook.Logger('Risk Cumulative')
 
 choose_treasury = functools.partial(choose_treasury, lambda *args: '10year',
                                     compound=False)
-
-
-def sortino_ratio(annualized_algorithm_return, treasury_return, downside_risk):
-    """
-    http://en.wikipedia.org/wiki/Sortino_ratio
-
-    Args:
-        algorithm_returns (np.array-like):
-            Returns from algorithm lifetime.
-        algorithm_period_return (float):
-            Algorithm return percentage from latest period.
-        mar (float): Minimum acceptable return.
-
-    Returns:
-        float. The Sortino ratio.
-    """
-    if np.isnan(downside_risk) or zp_math.tolerant_equals(downside_risk, 0):
-        return 0.0
-
-    return (annualized_algorithm_return - treasury_return) / downside_risk
 
 
 def information_ratio(algo_volatility, algorithm_return, benchmark_return):
