@@ -344,10 +344,7 @@ locally with pip.
 
 The following should install Zipline on many systems.
 
-        cd $ZIPLINE_SRC/conda
-        conda build ta-lib
-        conda build logbook
-        conda build zipline
+    conda install -c quantopian zipline
 
 # Contributors
 
