@@ -52,24 +52,13 @@ def asymmetric_round_price_to_penny(price, prefer_round_down,
     return rounded
 
 
-class ExchangeGetterMixin(object):
-    """
-    Mixin class implementing a simple get_exchange default for subclasses of
-    ExecutionStyle.
-
-    Note that this class must come BEFORE ExecutionStyle in a concrete class's
-    list of superclasses to properly fulfill the interface requirements of the
-    ExecutionStyle abstract base class.
-    """
-
-    def get_exchange(self):
-        return self.exchange
-
-
 class ExecutionStyle(with_metaclass(abc.ABCMeta)):
     """
     Abstract base class representing a modification to a standard order.
     """
+
+    # Set default instances, instances can override by setting `self._exchange`
+    _exchange = None
 
     @abc.abstractmethod
     def get_limit_price(self, is_buy):
@@ -87,18 +76,18 @@ class ExecutionStyle(with_metaclass(abc.ABCMeta)):
         """
         raise NotImplemented
 
-    @abc.abstractmethod
-    def get_exchange(self):
-        raise NotImplemented
+    @property
+    def exchange(self):
+        return self._exchange
 
 
-class MarketOrder(ExchangeGetterMixin, ExecutionStyle):
+class MarketOrder(ExecutionStyle):
     """
     Class encapsulating an order to be placed at the current market price.
     """
 
     def __init__(self, exchange=None):
-        self.exchange = exchange
+        self._exchange = exchange
 
     def get_limit_price(self, _is_buy):
         return None
@@ -107,7 +96,7 @@ class MarketOrder(ExchangeGetterMixin, ExecutionStyle):
         return None
 
 
-class LimitOrder(ExchangeGetterMixin, ExecutionStyle):
+class LimitOrder(ExecutionStyle):
     """
     Execution style representing an order to be executed at a price equal to or
     better than a specified limit price.
@@ -119,7 +108,7 @@ class LimitOrder(ExchangeGetterMixin, ExecutionStyle):
         if limit_price < 0:
             raise ValueError("Can't place a limit with a negative price.")
         self.limit_price = limit_price
-        self.exchange = exchange
+        self._exchange = exchange
 
     def get_limit_price(self, is_buy):
         return asymmetric_round_price_to_penny(self.limit_price, is_buy)
@@ -128,7 +117,7 @@ class LimitOrder(ExchangeGetterMixin, ExecutionStyle):
         return None
 
 
-class StopOrder(ExchangeGetterMixin, ExecutionStyle):
+class StopOrder(ExecutionStyle):
     """
     Execution style representing an order to be placed once the market price
     reaches a specified stop price.
@@ -142,7 +131,7 @@ class StopOrder(ExchangeGetterMixin, ExecutionStyle):
                 "Can't place a stop order with a negative price."
             )
         self.stop_price = stop_price
-        self.exchange = exchange
+        self._exchange = exchange
 
     def get_limit_price(self, _is_buy):
         return None
@@ -151,7 +140,7 @@ class StopOrder(ExchangeGetterMixin, ExecutionStyle):
         return asymmetric_round_price_to_penny(self.stop_price, not is_buy)
 
 
-class StopLimitOrder(ExchangeGetterMixin, ExecutionStyle):
+class StopLimitOrder(ExecutionStyle):
     """
     Execution style representing a limit order to be placed with a specified
     limit price once the market reaches a specified stop price.
@@ -171,7 +160,7 @@ class StopLimitOrder(ExchangeGetterMixin, ExecutionStyle):
 
         self.limit_price = limit_price
         self.stop_price = stop_price
-        self.exchange = exchange
+        self._exchange = exchange
 
     def get_limit_price(self, is_buy):
         return asymmetric_round_price_to_penny(self.limit_price, is_buy)
