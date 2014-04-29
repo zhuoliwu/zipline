@@ -15,10 +15,41 @@
 
 import abc
 
-from six import with_metaclass
 from sys import float_info
 
+from six import with_metaclass
+
 import zipline.utils.math_utils as zp_math
+
+
+def asymmetric_round_price_to_penny(price, prefer_round_down,
+                                    diff=(0.0095 - .005)):
+    """
+    Asymmetric rounding function for adjusting prices to two places in a way
+    that "improves" the price.  For limit prices, this means preferring to
+    round down on buys and preferring to round up on sells.  For stop prices,
+    it means the reverse.
+
+    If prefer_round_down == True:
+        When .05 below to .95 above a penny, use that penny.
+    If prefer_round_down == False:
+        When .95 below to .05 above a penny, use that penny.
+
+    In math-speak:
+    If prefer_round_down: [<X-1>.0095, X.0195) -> round to X.01.
+    If not prefer_round_down: (<X-1>.0005, X.0105] -> round to X.01.
+    """
+    # Subtracting an epsilon from diff to enforce the open-ness of the upper
+    # bound on buys and the lower bound on sells.  Using the actual system
+    # epsilon doesn't quite get there, so use a slightly less epsilon-ey value.
+    epsilon = float_info.epsilon * 10
+    diff = diff - epsilon
+
+    # relies on rounding half away from zero, unlike numpy's bankers' rounding
+    rounded = round(price - (diff if prefer_round_down else -diff), 2)
+    if zp_math.tolerant_equals(rounded, 0.0):
+        return 0.0
+    return rounded
 
 
 class ExchangeGetterMixin(object):
@@ -147,33 +178,3 @@ class StopLimitOrder(ExchangeGetterMixin, ExecutionStyle):
 
     def get_stop_price(self, is_buy):
         return asymmetric_round_price_to_penny(self.stop_price, not is_buy)
-
-
-def asymmetric_round_price_to_penny(price, prefer_round_down,
-                                    diff=(0.0095 - .005)):
-    """
-    Asymmetric rounding function for adjusting prices to two places in a way
-    that "improves" the price.  For limit prices, this means preferring to
-    round down on buys and preferring to round up on sells.  For stop prices,
-    it means the reverse.
-
-    If prefer_round_down == True:
-        When .05 below to .95 above a penny, use that penny.
-    If prefer_round_down == False:
-        When .95 below to .05 above a penny, use that penny.
-
-    In math-speak:
-    If prefer_round_down: [<X-1>.0095, X.0195) -> round to X.01.
-    If not prefer_round_down: (<X-1>.0005, X.0105] -> round to X.01.
-    """
-    # Subtracting an epsilon from diff to enforce the open-ness of the upper
-    # bound on buys and the lower bound on sells.  Using the actual system
-    # epsilon doesn't quite get there, so use a slightly less epsilon-ey value.
-    epsilon = float_info.epsilon * 10
-    diff = diff - epsilon
-
-    # relies on rounding half away from zero, unlike numpy's bankers' rounding
-    rounded = round(price - (diff if prefer_round_down else -diff), 2)
-    if zp_math.tolerant_equals(rounded, 0.0):
-        return 0.0
-    return rounded
