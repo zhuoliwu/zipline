@@ -483,7 +483,7 @@ class HistoryContainer(object):
                 return_frame.ix[algo_dt] = buffer_frame.iloc[0]
             else:
                 return_frame.ix[algo_dt] = buffer_frame.loc[algo_dt]
-        except ValueError, err:
+        except ValueError as err:
             # Log the field and algo datetime when history updates fail, to get
             # more information about under what conditions a ValueError is
             # raised when building the return frame..
