@@ -65,6 +65,13 @@ from zipline.gens.tradesimulation import AlgorithmSimulator
 from zipline.sources import DataFrameSource, DataPanelSource
 from zipline.transforms.utils import StatefulTransform
 from zipline.utils.api_support import ZiplineAPI, api_method
+from zipline.utils import events as events_module
+from zipline.utils.events import (
+    EventManager,
+    make_eventrule,
+    DateRuleFactory,
+    TimeRuleFactory,
+)
 from zipline.utils.factory import create_simulation_parameters
 
 import zipline.protocol
@@ -181,13 +188,15 @@ class TradingAlgorithm(object):
         self._before_trading_start = None
         self._analyze = None
 
+        self.event_manager = EventManager()
+
         if self.algoscript is not None:
             exec_(self.algoscript, self.namespace)
             self._initialize = self.namespace.get('initialize')
             if 'handle_data' not in self.namespace:
                 raise ValueError('You must define a handle_data function.')
             else:
-                self._handle_data = self.namespace['handle_data']
+                self._add_handle_data(self.namespace['handle_data'])
 
             self._before_trading_start = \
                 self.namespace.get('before_trading_start')
@@ -199,7 +208,7 @@ class TradingAlgorithm(object):
                 raise ValueError('You can not set script and \
                 initialize/handle_data.')
             self._initialize = kwargs.pop('initialize')
-            self._handle_data = kwargs.pop('handle_data')
+            self._add_handle_data(kwargs.pop('handle_data'))
             self._before_trading_start = kwargs.pop('before_trading_start',
                                                     None)
 
@@ -220,6 +229,19 @@ class TradingAlgorithm(object):
         if self.AUTO_INITIALIZE:
             self.initialized = True
 
+    def _add_handle_data(self, handle_data):
+        """
+        Adds the handle_data event.
+        """
+        self.event_manager.add_event(
+            events_module.Event(
+                events_module.Always(),
+                handle_data,
+                check_args=False,
+            ),
+            prepend=True,
+        )
+
     def initialize(self, *args, **kwargs):
         """
         Call self._initialize with `self` made available to Zipline API
@@ -238,7 +260,7 @@ class TradingAlgorithm(object):
         if self.history_container:
             self.history_container.update(data, self.datetime)
 
-        self._handle_data(self, data)
+        self.event_manager.handle_data(self, data, self.datetime)
 
     def analyze(self, perf):
         if self._analyze is None:
@@ -488,6 +510,35 @@ class TradingAlgorithm(object):
     @api_method
     def get_environment(self):
         return self._environment
+
+    @api_method
+    def add_event(self, rule=None, callback=None, check_args=True):
+        """
+        Adds an event to the algorithm's EventManager.
+        """
+        self.event_manager.add_event(
+            events_module.Event(rule, callback, check_args=check_args),
+        )
+
+    @api_method
+    def schedule_function(self,
+                          func,
+                          date_rule=None,
+                          time_rule=None,
+                          half_days=True,
+                          check_args=False):
+        """
+        Schedules a function to be called with some timed rules.
+        """
+        # Defaults to every day 30 minutes before close.
+        date_rule = date_rule or DateRuleFactory.day()
+        time_rule = time_rule or TimeRuleFactory.market_close(minutes=30)
+
+        self.add_event(
+            make_eventrule(date_rule, time_rule, half_days),
+            func,
+            check_args=check_args,
+        )
 
     @api_method
     def record(self, *args, **kwargs):
