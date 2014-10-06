@@ -37,22 +37,16 @@ class TestMutableIndexRollingPanel(unittest.TestCase):
 
         major_deque = deque(maxlen=window)
 
-        frames = {}
-
         for i, date in enumerate(dates):
             frame = pd.DataFrame(np.random.randn(3, 4), index=items,
                                  columns=minor)
 
             rp.add_frame(date, frame)
 
-            frames[date] = frame
             major_deque.append(date)
 
             result = rp.get_current()
-            expected = pd.Panel(frames, items=list(major_deque),
-                                major_axis=items, minor_axis=minor)
-
-            tm.assert_panel_equal(result, expected.swapaxes(0, 1))
+            tm.assert_frame_equal(result.loc[:, date, :], frame.T)
 
     def test_adding_and_dropping_items(self, n_items=5, n_minor=10, window=10,
                                        periods=30):
@@ -73,8 +67,6 @@ class TestMutableIndexRollingPanel(unittest.TestCase):
 
         dates = pd.date_range('2000-01-01', periods=periods, tz='utc')
 
-        frames = {}
-
         expected_frames = deque(maxlen=window)
         expected_dates = deque()
 
@@ -85,7 +77,6 @@ class TestMutableIndexRollingPanel(unittest.TestCase):
             if i >= window:
                 # Old labels and dates should start to get dropped at every
                 # call
-                del frames[expected_dates.popleft()]
                 expected_minor.popleft()
                 expected_items.popleft()
 
@@ -94,8 +85,6 @@ class TestMutableIndexRollingPanel(unittest.TestCase):
 
             rp.add_frame(date, frame)
 
-            frames[date] = frame
-
             result = rp.get_current()
             np.testing.assert_array_equal(sorted(result.minor_axis.values),
                                           sorted(expected_minor))
@@ -103,9 +92,6 @@ class TestMutableIndexRollingPanel(unittest.TestCase):
                                           sorted(expected_items))
             tm.assert_frame_equal(frame.T,
                                   result.ix[frame.index, -1, frame.columns])
-            expected_result = pd.Panel(frames).swapaxes(0, 1)
-            tm.assert_panel_equal(expected_result,
-                                  result)
 
             # Insert new items
             minor.popleft()

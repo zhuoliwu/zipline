@@ -32,9 +32,15 @@ class RollingPanel(object):
     Restrictions: major_axis can only be a DatetimeIndex for now
     """
 
-    def __init__(self, window, items, sids, cap_multiple=2, dtype=np.float64):
+    def __init__(self,
+                 window,
+                 items,
+                 sids,
+                 cap_multiple=2,
+                 dtype=np.float64,
+                 date_buf=None):
 
-        self.pos = 0
+        self.pos = window + 1
         self.window = window
 
         self.items = _ensure_index(items)
@@ -44,7 +50,8 @@ class RollingPanel(object):
         self.cap = cap_multiple * window
 
         self.dtype = dtype
-        self.date_buf = np.empty(self.cap, dtype='M8[ns]')
+        self.date_buf = np.empty(self.cap, dtype='M8[ns]') \
+            if date_buf is None else date_buf
 
         self.buffer = self._create_buffer()
 
@@ -61,6 +68,10 @@ class RollingPanel(object):
         self.minor_axis = _ensure_index(sids)
         self.buffer = self.buffer.reindex(minor_axis=self.minor_axis)
 
+    def set_fields(self, fields):
+        self.items = _ensure_index(fields)
+        self.buffer = self.buffer.reindex(items=self.items)
+
     def _create_buffer(self):
         panel = pd.Panel(
             items=self.items,
@@ -69,6 +80,42 @@ class RollingPanel(object):
             dtype=self.dtype,
         )
         return panel
+
+    def resize(self, window, cap_multiple=None):
+        """
+        Resizes the buffer to hold a new window with a new cap_multiple.
+        If cap_multiple is None, then the old cap_multiple is used.
+        """
+        if window == self.window and cap_multiple == self.cap_multiple:
+            # Nothing to be done.
+            return
+
+        self.window = window
+        self.cap_multiple = cap_multiple or self.cap_multiple
+
+        pre = self.cap
+        self.cap = self.cap_multiple * window
+        delta = self.cap - pre
+
+        self.pos += delta
+
+        self.date_buf = self.date_buf.copy()
+        self.date_buf.resize(self.cap)
+        self.date_buf = np.roll(self.date_buf, delta)
+
+        self.buffer = pd.concat(
+            [
+                pd.Panel(
+                    items=self.items,
+                    minor_axis=self.minor_axis,
+                    major_axis=range(delta),
+                    dtype=self.dtype,
+                ),
+                self.buffer
+            ],
+            axis=1,
+        )
+        self.buffer.major_axis = pd.Int64Index(range(self.cap))
 
     def add_frame(self, tick, frame):
         """
@@ -115,6 +162,9 @@ class RollingPanel(object):
             self.buffer.values[:, -self.window:, :]
         self.date_buf[:self.window] = self.date_buf[-self.window:]
         self.pos = self.window
+
+    def __len__(self):
+        return self.window
 
 
 class MutableIndexRollingPanel(RollingPanel):

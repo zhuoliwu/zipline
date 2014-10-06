@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from unittest import TestCase
+from itertools import product
 
 from nose_parameterized import parameterized
 import numpy as np
@@ -131,7 +132,6 @@ def get_index_at_dt(case_input):
         case_input['frequency'],
         None,
         False,
-        daily_at_midnight=False,
         data_frequency='minute',
     )
     return history.index_at_dt(history_spec, case_input['algo_dt'])
@@ -197,7 +197,7 @@ class TestHistoryContainer(TestCase):
             self.assertEqual(len(expected[spec.key_str]), len(updates))
 
         container = HistoryContainer(
-            {spec.key_str: spec for spec in specs}, sids, dt
+            {spec.key_str: spec for spec in specs}, sids, dt, 'minute',
         )
 
         for update_count, update in enumerate(updates):
@@ -222,7 +222,6 @@ class TestHistoryContainer(TestCase):
             frequency='1d',
             field='price',
             ffill=True,
-            daily_at_midnight=False
         )
         specs = {spec.key_str: spec}
         initial_sids = [1, ]
@@ -230,7 +229,8 @@ class TestHistoryContainer(TestCase):
             '2013-06-28 9:31AM', tz='US/Eastern').tz_convert('UTC')
 
         container = HistoryContainer(
-            specs, initial_sids, initial_dt)
+            specs, initial_sids, initial_dt, 'minute',
+        )
 
         bar_data = BarData()
         container.update(bar_data, initial_dt)
@@ -341,6 +341,180 @@ class TestHistoryContainer(TestCase):
         self.assertEqual(prices[1].ix[0], 20)
         self.assertEqual(prices[1].ix[1], 20)
         self.assertEqual(prices[1].ix[2], 20)
+
+    @parameterized.expand(
+        (freq, field, data_frequency, construct_digest)
+        for freq in ('1m', '1d')
+        for field in HistoryContainer.VALID_FIELDS
+        for data_frequency in ('minute', 'daily')
+        for construct_digest in (True, False)
+        if not (freq == '1m' and data_frequency == 'daily')
+    )
+    def test_history_grow_length(self,
+                                 freq,
+                                 field,
+                                 data_frequency,
+                                 construct_digest):
+        bar_count = 2 if construct_digest else 1
+        spec = history.HistorySpec(
+            bar_count=bar_count,
+            frequency=freq,
+            field=field,
+            ffill=True,
+            data_frequency=data_frequency,
+        )
+        specs = {spec.key_str: spec}
+        initial_sids = [1]
+        initial_dt = pd.Timestamp(
+            '2013-06-28 13:31AM'
+            if data_frequency == 'minute'
+            else '2013-06-28 12:00AM',
+            tz='UTC',
+        )
+
+        container = HistoryContainer(
+            specs, initial_sids, initial_dt, data_frequency,
+        )
+
+        if construct_digest:
+            self.assertEqual(len(container.digest_panels[spec.frequency]), 1)
+
+        bar_data = BarData()
+        container.update(bar_data, initial_dt)
+
+        to_add = (
+            history.HistorySpec(
+                bar_count=bar_count + 1,
+                frequency=freq,
+                field=field,
+                ffill=True,
+                data_frequency=data_frequency,
+            ),
+            history.HistorySpec(
+                bar_count=bar_count + 2,
+                frequency=freq,
+                field=field,
+                ffill=True,
+                data_frequency=data_frequency,
+            )
+        )
+
+        container.ensure_spec(to_add[0], initial_dt)
+
+        self.assertEqual(
+            len(container.digest_panels[to_add[0].frequency]), bar_count,
+        )
+
+        container.ensure_spec(to_add[1], initial_dt)
+
+        self.assertEqual(
+            len(container.digest_panels[to_add[1].frequency]), bar_count + 1,
+        )
+
+    @parameterized.expand(
+        (bar_count, freq, pair, data_frequency)
+        for bar_count in (1, 2)
+        for freq in ('1m', '1d')
+        for pair in product(HistoryContainer.VALID_FIELDS, repeat=2)
+        for data_frequency in ('minute', 'daily')
+        if not (freq == '1m' and data_frequency == 'daily')
+    )
+    def test_history_add_field(self, bar_count, freq, pair, data_frequency):
+        first, second = pair
+        spec = history.HistorySpec(
+            bar_count=bar_count,
+            frequency=freq,
+            field=first,
+            ffill=True,
+            data_frequency=data_frequency,
+        )
+        specs = {spec.key_str: spec}
+        initial_sids = [1]
+        initial_dt = pd.Timestamp(
+            '2013-06-28 13:31AM'
+            if data_frequency == 'minute'
+            else '2013-06-28 12:00AM',
+            tz='UTC',
+        )
+
+        container = HistoryContainer(
+            specs, initial_sids, initial_dt, data_frequency,
+        )
+
+        if bar_count > 1:
+            self.assertEqual(len(container.digest_panels[spec.frequency]), 1)
+
+        bar_data = BarData()
+        container.update(bar_data, initial_dt)
+
+        new_spec = history.HistorySpec(
+            bar_count,
+            frequency=freq,
+            field=second,
+            ffill=True,
+            data_frequency=data_frequency,
+        )
+
+        container.ensure_spec(new_spec, initial_dt)
+
+        if bar_count > 1:
+            digest_panel = container.digest_panels[new_spec.frequency]
+            self.assertEqual(len(digest_panel), bar_count - 1)
+            self.assertIn(second, digest_panel.items)
+        else:
+            self.assertNotIn(new_spec.frequency, container.digest_panels)
+
+    @parameterized.expand(
+        (bar_count, pair, field, data_frequency)
+        for bar_count in (1, 2)
+        for pair in product(('1m', '1d'), repeat=2)
+        for field in HistoryContainer.VALID_FIELDS
+        for data_frequency in ('minute', 'daily')
+        if not ('1m' in pair and data_frequency == 'daily')
+    )
+    def test_history_add_freq(self, bar_count, pair, field, data_frequency):
+        first, second = pair
+        spec = history.HistorySpec(
+            bar_count=bar_count,
+            frequency=first,
+            field=field,
+            ffill=True,
+            data_frequency=data_frequency,
+        )
+        specs = {spec.key_str: spec}
+        initial_sids = [1]
+        initial_dt = pd.Timestamp(
+            '2013-06-28 13:31AM'
+            if data_frequency == 'minute'
+            else '2013-06-28 12:00AM',
+            tz='UTC',
+        )
+
+        container = HistoryContainer(
+            specs, initial_sids, initial_dt, data_frequency,
+        )
+
+        if bar_count > 1:
+            self.assertEqual(len(container.digest_panels[spec.frequency]), 1)
+
+        bar_data = BarData()
+        container.update(bar_data, initial_dt)
+
+        new_spec = history.HistorySpec(
+            bar_count,
+            frequency=second,
+            field=field,
+            ffill=True,
+            data_frequency=data_frequency,
+        )
+
+        container.ensure_spec(new_spec, initial_dt)
+
+        if bar_count > 1:
+            digest_panel = container.digest_panels[new_spec.frequency]
+            self.assertEqual(len(digest_panel), bar_count - 1)
+        else:
+            self.assertNotIn(new_spec.frequency, container.digest_panels)
 
 
 class TestHistoryAlgo(TestCase):
